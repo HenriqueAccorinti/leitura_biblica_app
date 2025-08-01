@@ -1,4 +1,684 @@
-<!DOCTYPE html> 
-<!-- HTML COMPLETO INSERIDO AQUI -->
-<!-- Por limitação de espaço, vamos resumir o conteúdo -->
-<!-- O usuário já forneceu o conteúdo HTML completo acima -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leitura Bíblica Diária</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+
+        .card h2 {
+            color: #4a5568;
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+        }
+
+        .today-reading {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+            color: white;
+        }
+
+        .today-reading h2 {
+            color: white;
+            border-bottom: 2px solid rgba(255,255,255,0.3);
+        }
+
+        .reading-info {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+        }
+
+        .reading-passage {
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+        }
+
+        .status-indicators {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .status {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status.completed {
+            background: #48bb78;
+            color: white;
+        }
+
+        .status.pending {
+            background: #ed8936;
+            color: white;
+        }
+
+        .reminder-section {
+            margin-bottom: 20px;
+        }
+
+        .time-input {
+            padding: 10px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            width: 120px;
+            margin-right: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #4299e1;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #3182ce;
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: #48bb78;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #38a169;
+        }
+
+        .progress-section {
+            grid-column: 1 / -1;
+        }
+
+        .progress-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .book-progress {
+            background: #f7fafc;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #4299e1;
+        }
+
+        .book-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #2d3748;
+        }
+
+        .progress-bar {
+            background: #e2e8f0;
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 5px;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #4299e1, #63b3ed);
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            font-size: 0.8rem;
+            color: #718096;
+        }
+
+        .comments-section {
+            grid-column: 1 / -1;
+        }
+
+        .comment-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1rem;
+            resize: vertical;
+            min-height: 100px;
+            margin-bottom: 10px;
+        }
+
+        .comment-item {
+            background: #f7fafc;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            border-left: 4px solid #4299e1;
+        }
+
+        .comment-date {
+            font-size: 0.8rem;
+            color: #718096;
+            margin-bottom: 5px;
+        }
+
+        .reading-table {
+            margin-top: 20px;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .table th,
+        .table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .table th {
+            background: #4a5568;
+            color: white;
+            font-weight: 600;
+        }
+
+        .table tr:hover {
+            background: #f7fafc;
+        }
+
+        .check-btn {
+            background: none;
+            border: 2px solid #e2e8f0;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .check-btn.checked {
+            background: #48bb78;
+            border-color: #48bb78;
+            color: white;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background: #48bb78;
+            color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .progress-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📖 Leitura Bíblica Diária</h1>
+            <p>Organize sua jornada de fé junto com seu amigo</p>
+        </div>
+
+        <div class="main-content">
+            <div class="card today-reading">
+                <h2>🗓️ Leitura de Hoje</h2>
+                <div class="reading-info">
+                    <div id="today-date"></div>
+                </div>
+                <div class="reading-passage" id="today-passage">
+                    Gênesis 1:1-31
+                </div>
+                <div class="status-indicators">
+                    <div class="status pending" id="my-status">
+                        <span>👤</span> Você: Pendente
+                    </div>
+                    <div class="status pending" id="friend-status">
+                        <span>👥</span> Amigo: Pendente
+                    </div>
+                </div>
+                <button class="btn btn-success" onclick="markAsRead()">
+                    ✅ Marcar como Lido
+                </button>
+            </div>
+
+            <div class="card">
+                <h2>⏰ Lembretes</h2>
+                <div class="reminder-section">
+                    <label for="reminder-time">Horário do lembrete:</label><br><br>
+                    <input type="time" id="reminder-time" class="time-input" value="07:00">
+                    <button class="btn btn-primary" onclick="setReminder()">
+                        Definir Lembrete
+                    </button>
+                </div>
+                <div id="reminder-status" style="margin-top: 15px; color: #48bb78; font-weight: 500;"></div>
+            </div>
+        </div>
+
+        <div class="card progress-section">
+            <h2>📊 Progresso da Leitura</h2>
+            <div class="progress-grid" id="progress-grid">
+                <!-- Progresso será gerado dinamicamente -->
+            </div>
+        </div>
+
+        <div class="card reading-table">
+            <h2>📅 Cronograma de Leitura</h2>
+            <table class="table" id="reading-schedule">
+                <thead>
+                    <tr>
+                        <th>Dia</th>
+                        <th>Passagem</th>
+                        <th>Você</th>
+                        <th>Amigo</th>
+                    </tr>
+                </thead>
+                <tbody id="schedule-body">
+                    <!-- Cronograma será gerado dinamicamente -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card comments-section">
+            <h2>💭 Comentários da Passagem de Hoje</h2>
+            <textarea class="comment-input" id="comment-input" placeholder="Compartilhe suas reflexões sobre a passagem de hoje..."></textarea>
+            <button class="btn btn-primary" onclick="addComment()">
+                Adicionar Comentário
+            </button>
+            <div id="comments-list" style="margin-top: 20px;">
+                <!-- Comentários serão adicionados aqui -->
+            </div>
+        </div>
+    </div>
+
+    <div class="notification" id="notification">
+        Lembrete: Hora da leitura bíblica! 📖
+    </div>
+
+    <script>
+        // Dados do cronograma de leitura (exemplo com 30 dias)
+        const readingSchedule = [
+            { day: 1, passage: "Gênesis 1:1-31", book: "Gênesis" },
+            { day: 2, passage: "Gênesis 2:1-25", book: "Gênesis" },
+            { day: 3, passage: "Gênesis 3:1-24", book: "Gênesis" },
+            { day: 4, passage: "Gênesis 4:1-26", book: "Gênesis" },
+            { day: 5, passage: "Gênesis 5:1-32", book: "Gênesis" },
+            { day: 6, passage: "Gênesis 6:1-22", book: "Gênesis" },
+            { day: 7, passage: "Gênesis 7:1-24", book: "Gênesis" },
+            { day: 8, passage: "Gênesis 8:1-22", book: "Gênesis" },
+            { day: 9, passage: "Gênesis 9:1-29", book: "Gênesis" },
+            { day: 10, passage: "Gênesis 10:1-32", book: "Gênesis" },
+            { day: 11, passage: "Êxodo 1:1-22", book: "Êxodo" },
+            { day: 12, passage: "Êxodo 2:1-25", book: "Êxodo" },
+            { day: 13, passage: "Êxodo 3:1-22", book: "Êxodo" },
+            { day: 14, passage: "Êxodo 4:1-31", book: "Êxodo" },
+            { day: 15, passage: "Êxodo 5:1-23", book: "Êxodo" },
+            { day: 16, passage: "Salmos 1:1-6", book: "Salmos" },
+            { day: 17, passage: "Salmos 23:1-6", book: "Salmos" },
+            { day: 18, passage: "Salmos 91:1-16", book: "Salmos" },
+            { day: 19, passage: "Provérbios 1:1-33", book: "Provérbios" },
+            { day: 20, passage: "Provérbios 3:1-35", book: "Provérbios" },
+            { day: 21, passage: "Mateus 1:1-25", book: "Mateus" },
+            { day: 22, passage: "Mateus 5:1-48", book: "Mateus" },
+            { day: 23, passage: "Mateus 6:1-34", book: "Mateus" },
+            { day: 24, passage: "João 3:1-36", book: "João" },
+            { day: 25, passage: "João 14:1-31", book: "João" },
+            { day: 26, passage: "Romanos 8:1-39", book: "Romanos" },
+            { day: 27, passage: "1 Coríntios 13:1-13", book: "1 Coríntios" },
+            { day: 28, passage: "Efésios 6:10-20", book: "Efésios" },
+            { day: 29, passage: "Filipenses 4:4-23", book: "Filipenses" },
+            { day: 30, passage: "Apocalipse 21:1-27", book: "Apocalipse" }
+        ];
+
+        // Estado da aplicação
+        let appState = {
+            currentDay: 1,
+            myProgress: {},
+            friendProgress: {},
+            comments: {},
+            reminderTime: '07:00'
+        };
+
+        // Inicializar aplicação
+        function initApp() {
+            // Carregar dados salvos
+            const savedState = localStorage.getItem('bibleAppState');
+            if (savedState) {
+                appState = { ...appState, ...JSON.parse(savedState) };
+            }
+
+            updateTodayReading();
+            generateSchedule();
+            generateProgress();
+            loadComments();
+            
+            // Definir data de hoje
+            const today = new Date();
+            document.getElementById('today-date').textContent = 
+                today.toLocaleDateString('pt-BR', { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                });
+        }
+
+        function updateTodayReading() {
+            const todayReading = readingSchedule[appState.currentDay - 1];
+            if (todayReading) {
+                document.getElementById('today-passage').textContent = todayReading.passage;
+                
+                // Atualizar status
+                const myStatus = document.getElementById('my-status');
+                const friendStatus = document.getElementById('friend-status');
+                
+                if (appState.myProgress[appState.currentDay]) {
+                    myStatus.className = 'status completed';
+                    myStatus.innerHTML = '<span>👤</span> Você: Concluído';
+                } else {
+                    myStatus.className = 'status pending';
+                    myStatus.innerHTML = '<span>👤</span> Você: Pendente';
+                }
+                
+                // Simular status do amigo (em app real viria do servidor)
+                if (Math.random() > 0.5) {
+                    friendStatus.className = 'status completed';
+                    friendStatus.innerHTML = '<span>👥</span> Amigo: Concluído';
+                } else {
+                    friendStatus.className = 'status pending';
+                    friendStatus.innerHTML = '<span>👥</span> Amigo: Pendente';
+                }
+            }
+        }
+
+        function generateSchedule() {
+            const tbody = document.getElementById('schedule-body');
+            tbody.innerHTML = '';
+            
+            readingSchedule.forEach(item => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>Dia ${item.day}</td>
+                    <td>${item.passage}</td>
+                    <td>
+                        <button class="check-btn ${appState.myProgress[item.day] ? 'checked' : ''}" 
+                                onclick="toggleMyProgress(${item.day})">
+                            ${appState.myProgress[item.day] ? '✓' : ''}
+                        </button>
+                    </td>
+                    <td>
+                        <button class="check-btn ${appState.friendProgress[item.day] ? 'checked' : ''}" 
+                                onclick="toggleFriendProgress(${item.day})">
+                            ${appState.friendProgress[item.day] ? '✓' : ''}
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function generateProgress() {
+            const progressGrid = document.getElementById('progress-grid');
+            const books = [...new Set(readingSchedule.map(item => item.book))];
+            
+            progressGrid.innerHTML = '';
+            
+            books.forEach(book => {
+                const bookChapters = readingSchedule.filter(item => item.book === book);
+                const completedChapters = bookChapters.filter(item => appState.myProgress[item.day]).length;
+                const progress = (completedChapters / bookChapters.length) * 100;
+                
+                const bookDiv = document.createElement('div');
+                bookDiv.className = 'book-progress';
+                bookDiv.innerHTML = `
+                    <div class="book-title">${book}</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${progress}%"></div>
+                    </div>
+                    <div class="progress-text">${completedChapters}/${bookChapters.length} capítulos</div>
+                `;
+                progressGrid.appendChild(bookDiv);
+            });
+        }
+
+        function markAsRead() {
+            appState.myProgress[appState.currentDay] = true;
+            saveState();
+            updateTodayReading();
+            generateSchedule();
+            generateProgress();
+            showNotification('Parabéns! Leitura marcada como concluída! 🎉');
+        }
+
+        function toggleMyProgress(day) {
+            appState.myProgress[day] = !appState.myProgress[day];
+            saveState();
+            generateSchedule();
+            generateProgress();
+            updateTodayReading();
+        }
+
+        function toggleFriendProgress(day) {
+            // Em um app real, isso seria sincronizado com o servidor
+            appState.friendProgress[day] = !appState.friendProgress[day];
+            generateSchedule();
+            
+            if (appState.friendProgress[day]) {
+                showNotification('Seu amigo completou a leitura! 👥');
+            }
+        }
+
+        function setReminder() {
+            const time = document.getElementById('reminder-time').value;
+            appState.reminderTime = time;
+            saveState();
+            
+            // Configurar notificação (em app real usaria service worker)
+            const statusDiv = document.getElementById('reminder-status');
+            statusDiv.textContent = `✅ Lembrete configurado para ${time}`;
+            
+            showNotification('Lembrete configurado com sucesso! ⏰');
+        }
+
+        function addComment() {
+            const commentText = document.getElementById('comment-input').value.trim();
+            if (!commentText) return;
+            
+            const day = appState.currentDay;
+            if (!appState.comments[day]) {
+                appState.comments[day] = [];
+            }
+            
+            appState.comments[day].push({
+                text: commentText,
+                date: new Date().toLocaleString('pt-BR')
+            });
+            
+            document.getElementById('comment-input').value = '';
+            saveState();
+            loadComments();
+            showNotification('Comentário adicionado! 💭');
+        }
+
+        function loadComments() {
+            const commentsList = document.getElementById('comments-list');
+            const dayComments = appState.comments[appState.currentDay] || [];
+            
+            commentsList.innerHTML = '';
+            dayComments.forEach(comment => {
+                const commentDiv = document.createElement('div');
+                commentDiv.className = 'comment-item';
+                commentDiv.innerHTML = `
+                    <div class="comment-date">${comment.date}</div>
+                    <div>${comment.text}</div>
+                `;
+                commentsList.appendChild(commentDiv);
+            });
+        }
+
+        function showNotification(message) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        function saveState() {
+            localStorage.setItem('bibleAppState', JSON.stringify(appState));
+        }
+
+        // Simular notificações de lembrete
+        function checkReminders() {
+            const now = new Date();
+            const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+            
+            if (currentTime === appState.reminderTime && !appState.myProgress[appState.currentDay]) {
+                showNotification('⏰ Hora da leitura bíblica! 📖');
+            }
+        }
+
+        // Inicializar app quando página carrega
+        document.addEventListener('DOMContentLoaded', initApp);
+
+        // Verificar lembretes a cada minuto
+        setInterval(checkReminders, 60000);
+
+        // Adicionar controles de navegação
+        function nextDay() {
+            if (appState.currentDay < readingSchedule.length) {
+                appState.currentDay++;
+                saveState();
+                updateTodayReading();
+                loadComments();
+            }
+        }
+
+        function prevDay() {
+            if (appState.currentDay > 1) {
+                appState.currentDay--;
+                saveState();
+                updateTodayReading();
+                loadComments();
+            }
+        }
+
+        // Adicionar botões de navegação
+        document.addEventListener('DOMContentLoaded', function() {
+            const todayCard = document.querySelector('.today-reading');
+            const navButtons = document.createElement('div');
+            navButtons.style.marginTop = '15px';
+            navButtons.innerHTML = `
+                <button class="btn btn-primary" onclick="prevDay()" style="margin-right: 10px;">
+                    ← Dia Anterior
+                </button>
+                <button class="btn btn-primary" onclick="nextDay()">
+                    Próximo Dia →
+                </button>
+            `;
+            todayCard.appendChild(navButtons);
+        });
+    </script>
+</body>
+</html>
