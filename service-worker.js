@@ -2,7 +2,8 @@ const CACHE_NAME = 'bible-app-cache-v1';
 const urlsToCache = [
   '/',
   '/index.html',
-  '/sw.js',
+  '/service-worker.js',
+  '/manifest.json'
   // Adicione outros recursos se tiver, como '/style.css', '/icon.png'
 ];
 
