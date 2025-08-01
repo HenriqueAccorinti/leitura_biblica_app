@@ -541,12 +541,31 @@
         }
 
         function markAsRead() {
+            const todayReading = readingSchedule[appState.currentDay - 1];
+            const hoje = new Date().toISOString().split('T')[0];
+    
             appState.myProgress[appState.currentDay] = true;
             saveState();
             updateTodayReading();
             generateSchedule();
             generateProgress();
             showNotification('Parabéns! Leitura marcada como concluída! 🎉');
+    
+            // Enviar para Google Planilhas via Apps Script
+            fetch("https://script.google.com/macros/s/AKfycbyyl_wVmDozeowsXtkgQAne40wn2OKtgSA9AzkV2UqTF9sovLf1AieQUafigwmznpl0/exec", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    data: hoje,
+                    passagem: todayReading.passage,
+                    voce: true,
+                    amigo: appState.friendProgress[appState.currentDay] || false,
+                    comentario: ""
+                })
+            })
+            .then(res => res.text())
+            .then(resp => console.log("Resposta do servidor:", resp))
+            .catch(err => console.error("Erro ao enviar para planilha:", err));
         }
 
         function toggleMyProgress(day) {
