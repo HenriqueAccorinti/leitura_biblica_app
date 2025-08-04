@@ -514,10 +514,10 @@
                 <div class="user-setup">
                     <div class="user-buttons">
                         <button class="user-btn" onclick="selectUser('user1')" id="user1Btn">
-                            Usuário 1
+                            Rick
                         </button>
                         <button class="user-btn" onclick="selectUser('user2')" id="user2Btn">
-                            Usuário 2
+                            Bruna
                         </button>
                     </div>
                 </div>
@@ -865,7 +865,7 @@
                 <span class="check-icon ${user1Read ? 'read' : 'not-read'}">
                     ${user1Read ? '✓' : '○'}
                 </span>
-                Usuário 1: ${user1Read ? 'Leu' : 'Não leu'}
+                Rick: ${user1Read ? 'Leu' : 'Não leu'}
             </div>`;
             
             // Status Usuário 2
@@ -874,7 +874,7 @@
                 <span class="check-icon ${user2Read ? 'read' : 'not-read'}">
                     ${user2Read ? '✓' : '○'}
                 </span>
-                Usuário 2: ${user2Read ? 'Não leu' : 'Não leu'}
+                Bruna: ${user2Read ? 'Não leu' : 'Não leu'}
             </div>`;
             
             statusContainer.innerHTML = html;
@@ -909,7 +909,7 @@
             const today = new Date().toISOString().split('T')[0];
             
             if (otherUserRead && lastNotificationDate !== today && !currentUserRead) {
-                const otherUserName = otherUser === 'user1' ? 'Usuário 1' : 'Usuário 2';
+                const otherUserName = otherUser === 'user1' ? 'Rick' : 'Bruna';
                 showFriendReadNotification(otherUserName);
                 localStorage.setItem('lastFriendNotification', today);
             }
@@ -1025,8 +1025,8 @@
                         <tr>
                             <th class="date-col">Data</th>
                             <th class="reading-col">Leitura</th>
-                            <th class="status-col">Usuário 1</th>
-                            <th class="status-col">Usuário 2</th>
+                            <th class="status-col">Rick</th>
+                            <th class="status-col">Bruna</th>
                         </tr>
                     </thead>
                     <tbody>
