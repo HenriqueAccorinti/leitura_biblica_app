@@ -488,6 +488,21 @@
     <div class="container">
         <!-- Configuração -->
         <div class="section config-section">
+            <div class="config-toggle">
+                <button class="toggle-btn" onclick="toggleConfig()" id="toggleBtn">Mostrar Configuração</button>
+            </div>
+            <div id="configContent" class="hidden">
+                <div class="section-header">
+                    ⚙️ Configuração do Apps Script
+                </div>
+                <div class="section-content">
+                    <div class="form-group">
+                        <label for="scriptUrl">URL do Apps Script:</label>
+                        <input type="url" id="scriptUrl" placeholder="https://script.google.com/macros/s/AKfycbwpyBfUfH-_aWC58N-vSXE1VxlZkQA9g21E-Dw0XBcytACgzp8pVHqKEF7kM8IkjtRR/exec">
+                    </div>
+                    <button class="btn" onclick="saveConfig()">Salvar Configuração</button>
+                </div>
+            </div>
         </div>
 
         <!-- Seleção de Usuário -->
@@ -637,7 +652,10 @@
         // Inicialização
         window.addEventListener('load', () => {
             // Carregar configurações salvas
-            const fixedScriptUrl = '"https://script.google.com/macros/s/AKfycbwpyBfUfH-_aWC58N-vSXE1VxlZkQA9g21E-Dw0XBcytACgzp8pVHqKEF7kM8IkjtRR/exec"';
+            const savedUrl = localStorage.getItem('scriptUrl');
+            if (savedUrl) {
+                document.getElementById('scriptUrl').value = savedUrl;
+            }
             
             const savedUser = localStorage.getItem('currentUser');
             if (savedUser) {
@@ -693,7 +711,7 @@
             
             // Atualizar header
             const userName = userId === 'user1' ? 'Rick' : 'Bruna';
-            document.getElementById('userInfo').textContent = `Logado como: ${userName}`;
+            document.getElementById('userInfo').textContent = Logado como: ${userName};
             
             // Carregar dados
             loadData();
@@ -712,7 +730,18 @@
                 btn.textContent = 'Mostrar Configuração';
             }
         }
-                
+        
+        function saveConfig() {
+            const url = document.getElementById('scriptUrl').value;
+            if (url) {
+                localStorage.setItem('scriptUrl', url);
+                showMessage('Configuração salva com sucesso!', 'success');
+                if (currentUser) loadData();
+            } else {
+                showMessage('Por favor, insira uma URL válida.', 'error');
+            }
+        }
+        
         function setReminder() {
             const time = document.getElementById('reminderTime').value;
             if (!time) {
@@ -722,7 +751,7 @@
             
             localStorage.setItem('reminderTime', time);
             setupDailyReminder(time);
-            showMessage(`Lembrete configurado para ${time}!`, 'success');
+            showMessage(Lembrete configurado para ${time}!, 'success');
         }
         
         function setupDailyReminder(time) {
@@ -747,7 +776,7 @@
             
             // Atualizar status
             document.getElementById('reminderStatus').textContent = 
-                `Lembrete ativo para ${time} todos os dias`;
+                Lembrete ativo para ${time} todos os dias;
         }
         
         function checkActiveReminder() {
@@ -763,7 +792,7 @@
             
             if ('Notification' in window && Notification.permission === 'granted') {
                 new Notification('📖 Hora da Leitura Bíblica!', {
-                    body: `Leitura de hoje: ${todayReading}`,
+                    body: Leitura de hoje: ${todayReading},
                     icon: 'icon-192x192.png',
                     tag: 'bible-reading'
                 });
@@ -771,7 +800,7 @@
             
             // Mostrar popup interno
             document.getElementById('notificationTitle').textContent = '📖 Hora da Leitura Bíblica!';
-            document.getElementById('notificationText').textContent = `Leitura de hoje: ${todayReading}`;
+            document.getElementById('notificationText').textContent = Leitura de hoje: ${todayReading};
             document.getElementById('notificationPopup').classList.add('show');
         }
         
@@ -837,21 +866,21 @@
             
             // Status Usuário 1
             const user1Read = todayData && todayData.user1_read === 'true';
-            html += `<div class="status-item ${user1Read ? 'read' : 'not-read'}">
+            html += <div class="status-item ${user1Read ? 'read' : 'not-read'}">
                 <span class="check-icon ${user1Read ? 'read' : 'not-read'}">
                     ${user1Read ? '✓' : '○'}
                 </span>
                 Rick: ${user1Read ? 'Leu' : 'Não leu'}
-            </div>`;
+            </div>;
             
             // Status Usuário 2
             const user2Read = todayData && todayData.user2_read === 'true';
-            html += `<div class="status-item ${user2Read ? 'read' : 'not-read'}">
+            html += <div class="status-item ${user2Read ? 'read' : 'not-read'}">
                 <span class="check-icon ${user2Read ? 'read' : 'not-read'}">
                     ${user2Read ? '✓' : '○'}
                 </span>
                 Bruna: ${user2Read ? 'Não leu' : 'Não leu'}
-            </div>`;
+            </div>;
             
             statusContainer.innerHTML = html;
             
@@ -894,13 +923,13 @@
         function showFriendReadNotification(friendName) {
             if ('Notification' in window && Notification.permission === 'granted') {
                 new Notification('🎉 Seu amigo já leu!', {
-                    body: `${friendName} já fez a leitura bíblica de hoje!`,
+                    body: ${friendName} já fez a leitura bíblica de hoje!,
                     icon: 'icon-192x192.png',
                     tag: 'friend-read'
                 });
             }
             
-            showMessage(`🎉 ${friendName} já fez a leitura de hoje!`, 'success');
+            showMessage(🎉 ${friendName} já fez a leitura de hoje!, 'success');
         }
         
         function hasReadToday() {
@@ -950,7 +979,7 @@
         }
         
         async function loadData() {
-            const url = fixedScriptUrl;
+            const url = document.getElementById('scriptUrl').value;
             if (!url) {
                 showMessage('Configure a URL do Apps Script primeiro.', 'error');
                 return;
@@ -995,7 +1024,7 @@
                 return;
             }
             
-            let html = `
+            let html = 
                 <table>
                     <thead>
                         <tr>
@@ -1006,7 +1035,7 @@
                         </tr>
                     </thead>
                     <tbody>
-            `;
+            ;
             
             // Combinar dados do plano de leitura com dados salvos
             const sortedPlan = [...bibleReadingPlan].sort((a, b) => new Date(a.date) - new Date(b.date));
@@ -1018,7 +1047,7 @@
                 const user1Read = savedData && savedData.user1_read === 'true';
                 const user2Read = savedData && savedData.user2_read === 'true';
                 
-                html += `
+                html += 
                     <tr ${isToday ? 'class="today-row"' : ''}>
                         <td class="date-col">
                             ${new Date(planItem.date).toLocaleDateString('pt-BR')}
@@ -1036,7 +1065,7 @@
                             </span>
                         </td>
                     </tr>
-                `;
+                ;
             });
             
             html += '</tbody></table>';
@@ -1044,7 +1073,7 @@
         }
         
         async function updateSheet() {
-            const url = fixedScriptUrl;
+            const url = document.getElementById('scriptUrl').value;
             
             // Preparar dados para envio (incluir header)
             const dataToSend = [
