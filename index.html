@@ -488,21 +488,6 @@
     <div class="container">
         <!-- Configuração -->
         <div class="section config-section">
-            <div class="config-toggle">
-                <button class="toggle-btn" onclick="toggleConfig()" id="toggleBtn">Mostrar Configuração</button>
-            </div>
-            <div id="configContent" class="hidden">
-                <div class="section-header">
-                    ⚙️ Configuração do Apps Script
-                </div>
-                <div class="section-content">
-                    <div class="form-group">
-                        <label for="scriptUrl">URL do Apps Script:</label>
-                        <input type="url" id="scriptUrl" placeholder="https://script.google.com/macros/s/AKfycbwpyBfUfH-_aWC58N-vSXE1VxlZkQA9g21E-Dw0XBcytACgzp8pVHqKEF7kM8IkjtRR/exec">
-                    </div>
-                    <button class="btn" onclick="saveConfig()">Salvar Configuração</button>
-                </div>
-            </div>
         </div>
 
         <!-- Seleção de Usuário -->
@@ -652,10 +637,7 @@
         // Inicialização
         window.addEventListener('load', () => {
             // Carregar configurações salvas
-            const savedUrl = localStorage.getItem('scriptUrl');
-            if (savedUrl) {
-                document.getElementById('scriptUrl').value = savedUrl;
-            }
+            const fixedScriptUrl = 'https://script.google.com/macros/s/SEU_SCRIPT_URL_AQUI/exec';
             
             const savedUser = localStorage.getItem('currentUser');
             if (savedUser) {
@@ -730,18 +712,7 @@
                 btn.textContent = 'Mostrar Configuração';
             }
         }
-        
-        function saveConfig() {
-            const url = document.getElementById('scriptUrl').value;
-            if (url) {
-                localStorage.setItem('scriptUrl', url);
-                showMessage('Configuração salva com sucesso!', 'success');
-                if (currentUser) loadData();
-            } else {
-                showMessage('Por favor, insira uma URL válida.', 'error');
-            }
-        }
-        
+                
         function setReminder() {
             const time = document.getElementById('reminderTime').value;
             if (!time) {
@@ -979,7 +950,7 @@
         }
         
         async function loadData() {
-            const url = document.getElementById('scriptUrl').value;
+            const url = fixedScriptUrl;
             if (!url) {
                 showMessage('Configure a URL do Apps Script primeiro.', 'error');
                 return;
@@ -1073,7 +1044,7 @@
         }
         
         async function updateSheet() {
-            const url = document.getElementById('scriptUrl').value;
+            const url = fixedScriptUrl;
             
             // Preparar dados para envio (incluir header)
             const dataToSend = [
