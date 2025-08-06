@@ -351,50 +351,6 @@
             border-radius: 6px;
         }
         
-        .config-section {
-            background: #f8f6f4;
-            border: 1px solid #e0e0e0;
-        }
-        
-        .config-toggle {
-            text-align: right;
-            margin-bottom: 1rem;
-        }
-        
-        .toggle-btn {
-            background: none;
-            border: 1px solid #8B4513;
-            color: #8B4513;
-            padding: 6px 12px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 12px;
-        }
-        
-        .form-group {
-            margin-bottom: 1rem;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-            color: #8B4513;
-        }
-        
-        .form-group input[type="url"] {
-            width: 100%;
-            padding: 10px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 14px;
-        }
-        
-        .form-group input[type="url"]:focus {
-            outline: none;
-            border-color: #8B4513;
-        }
-        
         .offline-indicator {
             position: fixed;
             bottom: 20px;
@@ -432,6 +388,36 @@
             margin-left: 10px;
             cursor: pointer;
             font-weight: 500;
+        }
+
+        .connection-status {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            z-index: 100;
+            transition: all 0.3s;
+        }
+
+        .connection-status.connected {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .connection-status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .connection-status.loading {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
         }
         
         @media (max-width: 768px) {
@@ -472,6 +458,13 @@
                 margin: 0;
                 width: 100%;
             }
+
+            .connection-status {
+                top: 70px;
+                right: 10px;
+                left: 10px;
+                text-align: center;
+            }
         }
         
         .hidden {
@@ -485,26 +478,10 @@
         <div class="user-info" id="userInfo">Selecione seu usuário para começar</div>
     </div>
 
-    <div class="container">
-        <!-- Configuração -->
-        <div class="section config-section">
-            <div class="config-toggle">
-                <button class="toggle-btn" onclick="toggleConfig()" id="toggleBtn">Mostrar Configuração</button>
-            </div>
-            <div id="configContent" class="hidden">
-                <div class="section-header">
-                    ⚙️ Configuração do Apps Script
-                </div>
-                <div class="section-content">
-                    <div class="form-group">
-                        <label for="scriptUrl">URL do Apps Script:</label>
-                        <input type="url" id="scriptUrl" placeholder="https://script.google.com/macros/s/AKfycbwpyBfUfH-_aWC58N-vSXE1VxlZkQA9g21E-Dw0XBcytACgzp8pVHqKEF7kM8IkjtRR/exec">
-                    </div>
-                    <button class="btn" onclick="saveConfig()">Salvar Configuração</button>
-                </div>
-            </div>
-        </div>
+    <!-- Indicador de Conexão -->
+    <div class="connection-status hidden" id="connectionStatus"></div>
 
+    <div class="container">
         <!-- Seleção de Usuário -->
         <div class="section">
             <div class="section-header">
@@ -602,11 +579,16 @@
     </div>
 
     <script>
+        // Configuração do Google Apps Script - URL hardcoded
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwpyBfUfH-_aWC58N-vSXE1VxlZkQA9g21E-Dw0XBcytACgzp8pVHqKEF7kM8IkjtRR/exec';
+        
         // Estado da aplicação
         let currentUser = null;
         let readingData = [];
         let reminderInterval = null;
         let deferredPrompt = null;
+        let connectionRetryCount = 0;
+        const MAX_RETRIES = 3;
         
         // Dados de exemplo para leitura bíblica (cronograma anual)
         const bibleReadingPlan = [
@@ -619,7 +601,10 @@
             { date: '2025-01-07', reading: 'Gênesis 24-27' },
             { date: '2025-01-08', reading: 'João 1-3' },
             { date: '2025-01-09', reading: 'João 4-6' },
-            { date: '2025-01-10', reading: 'João 7-9' }
+            { date: '2025-01-10', reading: 'João 7-9' },
+            { date: '2025-08-06', reading: 'Salmos 119' },
+            { date: '2025-08-07', reading: 'Provérbios 1-3' },
+            { date: '2025-08-08', reading: 'Provérbios 4-6' }
             // Adicione mais datas conforme necessário
         ];
         
@@ -643,15 +628,23 @@
         function dismissInstall() {
             document.getElementById('installPrompt').style.display = 'none';
         }
+
+        function updateConnectionStatus(status, message) {
+            const statusEl = document.getElementById('connectionStatus');
+            statusEl.className = `connection-status ${status}`;
+            statusEl.textContent = message;
+            statusEl.classList.remove('hidden');
+            
+            // Ocultar após 3 segundos se for sucesso
+            if (status === 'connected') {
+                setTimeout(() => {
+                    statusEl.classList.add('hidden');
+                }, 3000);
+            }
+        }
         
         // Inicialização
         window.addEventListener('load', () => {
-            // Carregar configurações salvas
-            const savedUrl = localStorage.getItem('scriptUrl');
-            if (savedUrl) {
-                document.getElementById('scriptUrl').value = savedUrl;
-            }
-            
             const savedUser = localStorage.getItem('currentUser');
             if (savedUser) {
                 selectUser(savedUser);
@@ -664,7 +657,7 @@
             
             // Registrar service worker
             if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('sw.js');
+                navigator.serviceWorker.register('sw.js').catch(console.error);
             }
             
             // Solicitar permissão para notificações
@@ -675,21 +668,49 @@
             // Monitorar status online/offline
             window.addEventListener('online', () => {
                 document.getElementById('offlineIndicator').style.display = 'none';
-                if (currentUser) loadData();
+                if (currentUser) {
+                    connectionRetryCount = 0;
+                    loadData();
+                }
             });
             
             window.addEventListener('offline', () => {
                 document.getElementById('offlineIndicator').style.display = 'block';
             });
             
-            // Ocultar configuração se já tiver URL salva
-            if (savedUrl) {
-                toggleConfig();
-            }
-            
             // Verificar lembrete ativo
             checkActiveReminder();
+            
+            // Testar conexão inicial
+            if (navigator.onLine) {
+                testConnection();
+            }
         });
+
+        async function testConnection() {
+            try {
+                updateConnectionStatus('loading', '🔄 Testando conexão...');
+                const response = await fetch(SCRIPT_URL + '?action=read');
+                const result = await response.json();
+                
+                if (result.success || result.error) {
+                    updateConnectionStatus('connected', '✓ Conectado ao Google Sheets');
+                    connectionRetryCount = 0;
+                } else {
+                    throw new Error('Resposta inválida do servidor');
+                }
+            } catch (error) {
+                console.error('Erro de conexão:', error);
+                connectionRetryCount++;
+                
+                if (connectionRetryCount < MAX_RETRIES) {
+                    updateConnectionStatus('error', `⚠️ Erro de conexão. Tentativa ${connectionRetryCount}/${MAX_RETRIES}`);
+                    setTimeout(testConnection, 3000);
+                } else {
+                    updateConnectionStatus('error', '❌ Sem conexão com Google Sheets');
+                }
+            }
+        }
         
         function selectUser(userId) {
             currentUser = userId;
@@ -711,30 +732,6 @@
             // Carregar dados
             loadData();
             updateTodaySection();
-        }
-        
-        function toggleConfig() {
-            const content = document.getElementById('configContent');
-            const btn = document.getElementById('toggleBtn');
-            
-            if (content.classList.contains('hidden')) {
-                content.classList.remove('hidden');
-                btn.textContent = 'Ocultar Configuração';
-            } else {
-                content.classList.add('hidden');
-                btn.textContent = 'Mostrar Configuração';
-            }
-        }
-        
-        function saveConfig() {
-            const url = document.getElementById('scriptUrl').value;
-            if (url) {
-                localStorage.setItem('scriptUrl', url);
-                showMessage('Configuração salva com sucesso!', 'success');
-                if (currentUser) loadData();
-            } else {
-                showMessage('Por favor, insira uma URL válida.', 'error');
-            }
         }
         
         function setReminder() {
@@ -874,7 +871,7 @@
                 <span class="check-icon ${user2Read ? 'read' : 'not-read'}">
                     ${user2Read ? '✓' : '○'}
                 </span>
-                Bruna: ${user2Read ? 'Não leu' : 'Não leu'}
+                Bruna: ${user2Read ? 'Leu' : 'Não leu'}
             </div>`;
             
             statusContainer.innerHTML = html;
@@ -974,39 +971,64 @@
         }
         
         async function loadData() {
-            const url = document.getElementById('scriptUrl').value;
-            if (!url) {
-                showMessage('Configure a URL do Apps Script primeiro.', 'error');
+            if (!navigator.onLine) {
+                showMessage('Sem conexão. Usando dados offline.', 'info');
+                loadOfflineData();
                 return;
             }
             
             showLoading(true);
             
             try {
-                const response = await fetch(url + '?action=read');
+                updateConnectionStatus('loading', '🔄 Carregando dados...');
+                const response = await fetch(SCRIPT_URL + '?action=read');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
                 const result = await response.json();
                 
                 if (result.success) {
                     readingData = result.data.slice(1); // Remove header row
                     updateTodaySection();
                     renderTable();
-                    showMessage('Dados carregados com sucesso!', 'success');
+                    updateConnectionStatus('connected', '✓ Dados atualizados');
+                    
+                    // Salvar backup offline
+                    localStorage.setItem('offlineReadingData', JSON.stringify(readingData));
+                    connectionRetryCount = 0;
                 } else {
-                    throw new Error(result.error || 'Erro desconhecido');
+                    throw new Error(result.error || 'Erro desconhecido do servidor');
                 }
             } catch (error) {
                 console.error('Erro ao carregar dados:', error);
-                showMessage('Erro ao carregar dados. Usando dados offline.', 'error');
+                connectionRetryCount++;
                 
-                // Carregar dados offline se disponível
-                const offlineData = localStorage.getItem('offlineReadingData');
-                if (offlineData) {
-                    readingData = JSON.parse(offlineData);
-                    updateTodaySection();
-                    renderTable();
+                if (connectionRetryCount < MAX_RETRIES) {
+                    updateConnectionStatus('error', `⚠️ Erro ao carregar. Tentativa ${connectionRetryCount}/${MAX_RETRIES}`);
+                    setTimeout(loadData, 2000);
+                } else {
+                    updateConnectionStatus('error', '❌ Falha ao conectar. Usando dados offline');
+                    showMessage('Erro ao carregar dados online. Usando dados offline.', 'error');
+                    loadOfflineData();
                 }
             } finally {
                 showLoading(false);
+            }
+        }
+        
+        function loadOfflineData() {
+            const offlineData = localStorage.getItem('offlineReadingData');
+            if (offlineData) {
+                readingData = JSON.parse(offlineData);
+                updateTodaySection();
+                renderTable();
+            } else {
+                // Criar dados básicos se não houver offline
+                readingData = [];
+                updateTodaySection();
+                renderTable();
             }
         }
         
@@ -1015,7 +1037,7 @@
             const today = new Date().toISOString().split('T')[0];
             
             if (readingData.length === 0) {
-                container.innerHTML = '<div style="text-align: center; padding: 2rem; color: #666;">Nenhum dado encontrado. Configure o Apps Script e carregue os dados.</div>';
+                container.innerHTML = '<div style="text-align: center; padding: 2rem; color: #666;">Nenhum dado encontrado. Os dados serão carregados automaticamente quando você marcar leituras.</div>';
                 return;
             }
             
@@ -1033,7 +1055,7 @@
             `;
             
             // Combinar dados do plano de leitura com dados salvos
-            const sortedPlan = [...bibleReadingPlan].sort((a, b) => new Date(a.date) - new Date(b.date));
+            const sortedPlan = [...bibleReadingPlan].sort((a, b) => new Date(b.date) - new Date(a.date));
             
             sortedPlan.forEach(planItem => {
                 const savedData = readingData.find(r => r.date === planItem.date);
@@ -1068,33 +1090,50 @@
         }
         
         async function updateSheet() {
-            const url = document.getElementById('scriptUrl').value;
-            
-            // Preparar dados para envio (incluir header)
-            const dataToSend = [
-                ['date', 'reading', 'user1_read', 'user2_read'],
-                ...readingData.map(row => [row.date, row.reading, row.user1_read, row.user2_read])
-            ];
-            
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    action: 'write',
-                    data: dataToSend
-                })
-            });
-            
-            const result = await response.json();
-            
-            if (!result.success) {
-                throw new Error(result.error || 'Erro ao atualizar planilha');
+            if (!navigator.onLine) {
+                throw new Error('Sem conexão com a internet');
             }
             
-            // Salvar offline backup
-            localStorage.setItem('offlineReadingData', JSON.stringify(readingData));
+            try {
+                updateConnectionStatus('loading', '🔄 Salvando...');
+                
+                // Preparar dados para envio (incluir header)
+                const dataToSend = [
+                    ['date', 'reading', 'user1_read', 'user2_read'],
+                    ...readingData.map(row => [row.date, row.reading, row.user1_read, row.user2_read])
+                ];
+                
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'write',
+                        data: dataToSend
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const result = await response.json();
+                
+                if (!result.success) {
+                    throw new Error(result.error || 'Erro ao salvar dados');
+                }
+                
+                updateConnectionStatus('connected', '✓ Dados salvos');
+                
+                // Salvar offline backup
+                localStorage.setItem('offlineReadingData', JSON.stringify(readingData));
+                connectionRetryCount = 0;
+                
+            } catch (error) {
+                updateConnectionStatus('error', '❌ Erro ao salvar');
+                throw error;
+            }
         }
         
         function showLoading(show) {
@@ -1114,7 +1153,7 @@
         
         // Verificar novos dados periodicamente quando online
         setInterval(() => {
-            if (navigator.onLine && currentUser) {
+            if (navigator.onLine && currentUser && connectionRetryCount === 0) {
                 loadData();
             }
         }, 5 * 60 * 1000); // A cada 5 minutos
