@@ -10,21 +10,21 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="Leitura Bíblica">
     <link rel="apple-touch-icon" href="icon-192x192.png">
-    
+
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #f5f3f0 0%, #e8e5e1 100%);
             color: #2c2c2c;
             min-height: 100vh;
         }
-        
+
         .header {
             background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
             color: white;
@@ -32,23 +32,23 @@
             text-align: center;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
-        
+
         .header h1 {
             font-size: 1.5rem;
             margin-bottom: 0.5rem;
         }
-        
+
         .user-info {
             font-size: 0.9rem;
             opacity: 0.9;
         }
-        
+
         .container {
             max-width: 1000px;
             margin: 0 auto;
             padding: 1rem;
         }
-        
+
         .section {
             background: white;
             margin-bottom: 1.5rem;
@@ -56,7 +56,7 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             overflow: hidden;
         }
-        
+
         .section-header {
             background: #f8f6f4;
             padding: 1rem;
@@ -67,23 +67,23 @@
             align-items: center;
             gap: 0.5rem;
         }
-        
+
         .section-content {
             padding: 1rem;
         }
-        
+
         .user-setup {
             display: flex;
             flex-direction: column;
             gap: 1rem;
         }
-        
+
         .user-buttons {
             display: flex;
             gap: 1rem;
             flex-wrap: wrap;
         }
-        
+
         .user-btn {
             flex: 1;
             min-width: 120px;
@@ -96,34 +96,34 @@
             font-weight: 500;
             transition: all 0.3s;
         }
-        
+
         .user-btn.active {
             background: #8B4513;
             color: white;
         }
-        
+
         .user-btn:hover {
             background: #f0f0f0;
         }
-        
+
         .user-btn.active:hover {
             background: #A0522D;
         }
-        
+
         .reminder-setup {
             display: grid;
             grid-template-columns: 1fr auto;
             gap: 1rem;
             align-items: center;
         }
-        
+
         .time-input {
             padding: 10px;
             border: 2px solid #ddd;
             border-radius: 8px;
             font-size: 16px;
         }
-        
+
         .btn {
             padding: 10px 20px;
             border: none;
@@ -135,56 +135,56 @@
             font-weight: 500;
             transition: background 0.3s;
         }
-        
+
         .btn:hover {
             background: #A0522D;
         }
-        
+
         .btn:disabled {
             background: #ccc;
             cursor: not-allowed;
         }
-        
+
         .btn-secondary {
             background: #6c757d;
         }
-        
+
         .btn-secondary:hover {
             background: #545b62;
         }
-        
+
         .btn-success {
             background: #28a745;
         }
-        
+
         .btn-success:hover {
             background: #218838;
         }
-        
+
         .today-reading {
             text-align: center;
             padding: 2rem 1rem;
         }
-        
+
         .today-verse {
             font-size: 1.5rem;
             font-weight: 600;
             color: #8B4513;
             margin-bottom: 1rem;
         }
-        
+
         .today-date {
             color: #666;
             margin-bottom: 2rem;
         }
-        
+
         .reading-status {
             display: flex;
             gap: 1rem;
             justify-content: center;
             flex-wrap: wrap;
         }
-        
+
         .status-item {
             display: flex;
             align-items: center;
@@ -194,41 +194,41 @@
             background: #f8f9fa;
             border: 2px solid transparent;
         }
-        
+
         .status-item.read {
             background: #d4edda;
             border-color: #28a745;
             color: #155724;
         }
-        
+
         .status-item.not-read {
             background: #fff3cd;
             border-color: #ffc107;
             color: #856404;
         }
-        
+
         .mark-read-btn {
             margin-top: 1rem;
             padding: 12px 24px;
             font-size: 16px;
         }
-        
+
         .reading-table {
             overflow-x: auto;
         }
-        
+
         table {
             width: 100%;
             border-collapse: collapse;
             min-width: 600px;
         }
-        
+
         th, td {
             padding: 12px;
             text-align: left;
             border-bottom: 1px solid #e0e0e0;
         }
-        
+
         th {
             background: #f8f6f4;
             font-weight: 600;
@@ -237,66 +237,66 @@
             top: 0;
             z-index: 1;
         }
-        
+
         tr:hover {
             background: #f8f9fa;
         }
-        
+
         .date-col {
             width: 100px;
         }
-        
+
         .reading-col {
             width: 200px;
         }
-        
+
         .status-col {
             width: 80px;
             text-align: center;
         }
-        
+
         .check-icon {
             font-size: 1.2rem;
         }
-        
+
         .check-icon.read {
             color: #28a745;
         }
-        
+
         .check-icon.not-read {
             color: #ccc;
         }
-        
+
         .today-row {
             background: #fff3cd !important;
             font-weight: 600;
         }
-        
+
         .message {
             padding: 1rem;
             border-radius: 8px;
             margin-bottom: 1rem;
             display: none;
         }
-        
+
         .message.success {
             background: #d4edda;
             color: #155724;
             border: 1px solid #c3e6cb;
         }
-        
+
         .message.error {
             background: #f8d7da;
             color: #721c24;
             border: 1px solid #f5c6cb;
         }
-        
+
         .message.info {
             background: #cce5ff;
             color: #004085;
             border: 1px solid #b3d7ff;
         }
-        
+
         .notification-popup {
             position: fixed;
             top: 20px;
@@ -310,12 +310,12 @@
             display: none;
             border-left: 4px solid #8B4513;
         }
-        
+
         .notification-popup.show {
             display: block;
             animation: slideIn 0.3s ease-out;
         }
-        
+
         @keyframes slideIn {
             from {
                 transform: translateX(100%);
@@ -326,41 +326,41 @@
                 opacity: 1;
             }
         }
-        
+
         .notification-title {
             font-weight: 600;
             color: #8B4513;
             margin-bottom: 0.5rem;
         }
-        
+
         .notification-text {
             color: #666;
             margin-bottom: 1rem;
             line-height: 1.4;
         }
-        
+
         .notification-actions {
             display: flex;
             gap: 0.5rem;
         }
-        
+
         .notification-btn {
             flex: 1;
             padding: 8px 12px;
             font-size: 12px;
             border-radius: 6px;
         }
-        
+
         .config-section {
             background: #f8f6f4;
             border: 1px solid #e0e0e0;
         }
-        
+
         .config-toggle {
             text-align: right;
             margin-bottom: 1rem;
         }
-        
+
         .toggle-btn {
             background: none;
             border: 1px solid #8B4513;
@@ -370,18 +370,18 @@
             cursor: pointer;
             font-size: 12px;
         }
-        
+
         .form-group {
             margin-bottom: 1rem;
         }
-        
+
         .form-group label {
             display: block;
             margin-bottom: 0.5rem;
             font-weight: 500;
             color: #8B4513;
         }
-        
+
         .form-group input[type="url"] {
             width: 100%;
             padding: 10px;
@@ -389,12 +389,12 @@
             border-radius: 8px;
             font-size: 14px;
         }
-        
+
         .form-group input[type="url"]:focus {
             outline: none;
             border-color: #8B4513;
         }
-        
+
         .offline-indicator {
             position: fixed;
             bottom: 20px;
@@ -406,7 +406,7 @@
             font-size: 12px;
             display: none;
         }
-        
+
         .install-prompt {
             position: fixed;
             bottom: 20px;
@@ -422,7 +422,7 @@
             z-index: 1000;
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
-        
+
         .install-prompt button {
             background: white;
             color: #8B4513;
@@ -433,47 +433,87 @@
             cursor: pointer;
             font-weight: 500;
         }
-        
+
+        .book-group {
+            margin-bottom: 1.5rem;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .book-header {
+            background: #f8f6f4;
+            padding: 1rem;
+            font-weight: 600;
+            color: #8B4513;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .book-header .toggle-icon {
+            transition: transform 0.3s ease;
+        }
+
+        .book-header.collapsed .toggle-icon {
+            transform: rotate(0deg);
+        }
+
+        .book-header .toggle-icon {
+             transform: rotate(90deg);
+        }
+
+
+        .book-content {
+            display: none; /* Start collapsed */
+        }
+
+        .book-content.expanded {
+            display: block;
+        }
+
+
         @media (max-width: 768px) {
             .container {
                 padding: 0.5rem;
             }
-            
+
             .user-buttons {
                 flex-direction: column;
             }
-            
+
             .user-btn {
                 min-width: auto;
             }
-            
+
             .reminder-setup {
                 grid-template-columns: 1fr;
             }
-            
+
             .reading-status {
                 flex-direction: column;
                 align-items: center;
             }
-            
+
             .notification-popup {
                 right: 10px;
                 left: 10px;
                 max-width: none;
             }
-            
+
             .install-prompt {
                 flex-direction: column;
                 text-align: center;
                 gap: 1rem;
             }
-            
+
             .install-prompt button {
                 margin: 0;
                 width: 100%;
             }
         }
-        
+
         .hidden {
             display: none !important;
         }
@@ -481,29 +521,11 @@
 </head>
 <body>
     <div class="header">
-        <h1>📖 Leitura Bíblica Compartilhada</h1>
+        <h1>📖 Daily Bible</h1>
         <div class="user-info" id="userInfo">Selecione seu usuário para começar</div>
     </div>
 
     <div class="container">
-        <!-- Configuração -->
-        <div class="section config-section">
-            <div class="config-toggle">
-                <button class="toggle-btn" onclick="toggleConfig()" id="toggleBtn">Mostrar Configuração</button>
-            </div>
-            <div id="configContent" class="hidden">
-                <div class="section-header">
-                    ⚙️ Configuração do Apps Script
-                </div>
-                <div class="section-content">
-                    <div class="form-group">
-                        <label for="scriptUrl">URL do Apps Script:</label>
-                        <input type="url" id="scriptUrl" placeholder="https://script.google.com/macros/s/AKfycbwpyBfUfH-_aWC58N-vSXE1VxlZkQA9g21E-Dw0XBcytACgzp8pVHqKEF7kM8IkjtRR/exec">
-                    </div>
-                    <button class="btn" onclick="saveConfig()">Salvar Configuração</button>
-                </div>
-            </div>
-        </div>
 
         <!-- Seleção de Usuário -->
         <div class="section">
@@ -517,7 +539,7 @@
                             Rick
                         </button>
                         <button class="user-btn" onclick="selectUser('user2')" id="user2Btn">
-                            Bruna
+                            Bruna Diamante
                         </button>
                     </div>
                 </div>
@@ -559,8 +581,9 @@
         <div class="section" id="tableSection" style="display: none;">
             <div class="section-header">
                 📋 Cronograma de Leituras
-                <div style="margin-left: auto;">
+                <div style="margin-left: auto; display: flex; gap: 10px;">
                     <button class="btn btn-secondary" onclick="loadData()">🔄 Atualizar</button>
+                     <button class="btn btn-secondary" id="toggleViewBtn" onclick="toggleTableView()">Ver Cronograma Completo</button>
                 </div>
             </div>
             <div class="section-content">
@@ -604,32 +627,19 @@
     <script>
         // Estado da aplicação
         let currentUser = null;
-        let readingData = [];
+        let readingData = []; // This will store data fetched from the sheet
         let reminderInterval = null;
         let deferredPrompt = null;
-        
-        // Dados de exemplo para leitura bíblica (cronograma anual)
-        const bibleReadingPlan = [
-            { date: '2025-01-01', reading: 'Gênesis 1-3' },
-            { date: '2025-01-02', reading: 'Gênesis 4-7' },
-            { date: '2025-01-03', reading: 'Gênesis 8-11' },
-            { date: '2025-01-04', reading: 'Gênesis 12-15' },
-            { date: '2025-01-05', reading: 'Gênesis 16-19' },
-            { date: '2025-01-06', reading: 'Gênesis 20-23' },
-            { date: '2025-01-07', reading: 'Gênesis 24-27' },
-            { date: '2025-01-08', reading: 'João 1-3' },
-            { date: '2025-01-09', reading: 'João 4-6' },
-            { date: '2025-01-10', reading: 'João 7-9' }
-            // Adicione mais datas conforme necessário
-        ];
-        
+        let fullView = false; // State to track table view
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwpyBfUfH-_aWC58N-vSXE1VxlZkQA9g21E-Dw0XBcytACgzp8pVHqKEF7kM8IkjtRR/exec"; // Your Google Apps Script URL
+
         // PWA Installation
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
             document.getElementById('installPrompt').style.display = 'flex';
         });
-        
+
         function installApp() {
             if (deferredPrompt) {
                 deferredPrompt.prompt();
@@ -639,152 +649,126 @@
                 });
             }
         }
-        
+
         function dismissInstall() {
             document.getElementById('installPrompt').style.display = 'none';
         }
-        
+
         // Inicialização
         window.addEventListener('load', () => {
-            // Carregar configurações salvas
-            const savedUrl = localStorage.getItem('scriptUrl');
-            if (savedUrl) {
-                document.getElementById('scriptUrl').value = savedUrl;
-            }
-            
+            // Load saved settings
             const savedUser = localStorage.getItem('currentUser');
             if (savedUser) {
                 selectUser(savedUser);
             }
-            
+
             const savedTime = localStorage.getItem('reminderTime');
             if (savedTime) {
                 document.getElementById('reminderTime').value = savedTime;
             }
-            
-            // Registrar service worker
+
+            // Register service worker
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.register('sw.js');
             }
-            
-            // Solicitar permissão para notificações
+
+            // Request notification permission
             if ('Notification' in window) {
                 Notification.requestPermission();
             }
-            
-            // Monitorar status online/offline
+
+            // Monitor online/offline status
             window.addEventListener('online', () => {
                 document.getElementById('offlineIndicator').style.display = 'none';
-                if (currentUser) loadData();
+                if (currentUser) loadData(); // Reload data when back online
             });
-            
+
             window.addEventListener('offline', () => {
                 document.getElementById('offlineIndicator').style.display = 'block';
             });
-            
-            // Ocultar configuração se já tiver URL salva
-            if (savedUrl) {
-                toggleConfig();
-            }
-            
-            // Verificar lembrete ativo
+
+            // Check active reminder
             checkActiveReminder();
         });
-        
+
         function selectUser(userId) {
             currentUser = userId;
             localStorage.setItem('currentUser', userId);
-            
-            // Atualizar interface
+
+            // Update UI
             document.querySelectorAll('.user-btn').forEach(btn => btn.classList.remove('active'));
             document.getElementById(userId + 'Btn').classList.add('active');
-            
-            // Mostrar seções relevantes
+
+            // Show relevant sections
             document.getElementById('reminderSection').style.display = 'block';
             document.getElementById('todaySection').style.display = 'block';
             document.getElementById('tableSection').style.display = 'block';
-            
-            // Atualizar header
-            const userName = userId === 'user1' ? 'Rick' : 'Bruna';
+
+            // Update header
+            const userName = userId === 'user1' ? 'Rick' : 'Bruna Diamante';
             document.getElementById('userInfo').textContent = `Logado como: ${userName}`;
-            
-            // Carregar dados
+
+            // Load data for the selected user
             loadData();
-            updateTodaySection();
         }
-        
-        function toggleConfig() {
-            const content = document.getElementById('configContent');
-            const btn = document.getElementById('toggleBtn');
-            
-            if (content.classList.contains('hidden')) {
-                content.classList.remove('hidden');
-                btn.textContent = 'Ocultar Configuração';
-            } else {
-                content.classList.add('hidden');
-                btn.textContent = 'Mostrar Configuração';
-            }
-        }
-        
-        function saveConfig() {
-            const url = document.getElementById('scriptUrl').value;
-            if (url) {
-                localStorage.setItem('scriptUrl', url);
-                showMessage('Configuração salva com sucesso!', 'success');
-                if (currentUser) loadData();
-            } else {
-                showMessage('Por favor, insira uma URL válida.', 'error');
-            }
-        }
-        
+
         function setReminder() {
             const time = document.getElementById('reminderTime').value;
             if (!time) {
                 showMessage('Selecione um horário para o lembrete.', 'error');
                 return;
             }
-            
+
             localStorage.setItem('reminderTime', time);
             setupDailyReminder(time);
             showMessage(`Lembrete configurado para ${time}!`, 'success');
         }
-        
+
         function setupDailyReminder(time) {
-            // Limpar lembrete anterior
+            // Clear previous reminder
             if (reminderInterval) {
                 clearInterval(reminderInterval);
             }
-            
+
             const [hours, minutes] = time.split(':').map(Number);
-            
+
             function checkReminder() {
                 const now = new Date();
-                if (now.getHours() === hours && now.getMinutes() === minutes) {
-                    if (!hasReadToday()) {
+                const nowHours = now.getHours();
+                const nowMinutes = now.getMinutes();
+
+                // Check if current time matches reminder time, and hasn't been triggered today
+                const lastReminderDate = localStorage.getItem('lastReminderDate');
+                const today = new Date().toISOString().split('T')[0];
+
+                if (nowHours === hours && nowMinutes === minutes && lastReminderDate !== today) {
+                     if (!hasReadToday()) {
                         showReadingReminder();
+                        localStorage.setItem('lastReminderDate', today); // Mark reminder as triggered for today
                     }
                 }
             }
-            
-            // Verificar a cada minuto
+
+            // Check every minute
             reminderInterval = setInterval(checkReminder, 60000);
-            
-            // Atualizar status
-            document.getElementById('reminderStatus').textContent = 
+
+            // Update status
+            document.getElementById('reminderStatus').textContent =
                 `Lembrete ativo para ${time} todos os dias`;
         }
-        
+
         function checkActiveReminder() {
             const savedTime = localStorage.getItem('reminderTime');
             if (savedTime) {
                 setupDailyReminder(savedTime);
             }
         }
-        
+
         function showReadingReminder() {
             const today = new Date().toISOString().split('T')[0];
-            const todayReading = getTodayReading();
-            
+            const todayData = readingData.find(r => r.date === today);
+            const todayReading = todayData ? todayData.reading : 'Sem leitura programada para hoje';
+
             if ('Notification' in window && Notification.permission === 'granted') {
                 new Notification('📖 Hora da Leitura Bíblica!', {
                     body: `Leitura de hoje: ${todayReading}`,
@@ -792,129 +776,142 @@
                     tag: 'bible-reading'
                 });
             }
-            
-            // Mostrar popup interno
+
+            // Show internal popup
             document.getElementById('notificationTitle').textContent = '📖 Hora da Leitura Bíblica!';
             document.getElementById('notificationText').textContent = `Leitura de hoje: ${todayReading}`;
             document.getElementById('notificationPopup').classList.add('show');
         }
-        
+
         function snoozeReminder() {
             dismissNotification();
             setTimeout(() => {
                 if (!hasReadToday()) {
                     showReadingReminder();
                 }
-            }, 60 * 60 * 1000); // 1 hora
+            }, 60 * 60 * 1000); // 1 hour
             showMessage('Lembrete adiado por 1 hora', 'info');
         }
-        
+
         function markAsReadFromNotification() {
             dismissNotification();
             markAsRead();
         }
-        
+
         function dismissNotification() {
             document.getElementById('notificationPopup').classList.remove('show');
         }
-        
+
         function updateTodaySection() {
             const today = new Date();
             const todayStr = today.toISOString().split('T')[0];
-            
-            // Atualizar data
-            document.getElementById('todayDate').textContent = 
-                today.toLocaleDateString('pt-BR', { 
-                    weekday: 'long', 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric' 
+
+            // Update date
+            document.getElementById('todayDate').textContent =
+                today.toLocaleDateString('pt-BR', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
                 });
-            
-            // Atualizar leitura do dia
-            const todayReading = getTodayReading();
-            document.getElementById('todayVerse').textContent = todayReading;
-            
-            // Atualizar status de leitura
+
+            // Update today's reading and status based on fetched data
+            const todayData = readingData.find(r => r.date === todayStr);
+
+            if (todayData) {
+                document.getElementById('todayVerse').textContent = todayData.reading;
+            } else {
+                document.getElementById('todayVerse').textContent = 'Sem leitura programada para hoje';
+            }
+
+            // Update reading status indicators
             updateReadingStatus();
         }
-        
-        function getTodayReading() {
-            const today = new Date().toISOString().split('T')[0];
-            const reading = bibleReadingPlan.find(r => r.date === today);
-            return reading ? reading.reading : 'Sem leitura programada para hoje';
-        }
-        
+
         function updateReadingStatus() {
             const statusContainer = document.getElementById('readingStatus');
             const markBtn = document.getElementById('markReadBtn');
-            
+
             if (readingData.length === 0) {
                 statusContainer.innerHTML = '<div class="status-item">Carregando status...</div>';
-                return;
-            }
-            
-            const today = new Date().toISOString().split('T')[0];
-            const todayData = readingData.find(r => r.date === today);
-            
-            let html = '';
-            
-            // Status Usuário 1
-            const user1Read = todayData && todayData.user1_read === 'true';
-            html += `<div class="status-item ${user1Read ? 'read' : 'not-read'}">
-                <span class="check-icon ${user1Read ? 'read' : 'not-read'}">
-                    ${user1Read ? '✓' : '○'}
-                </span>
-                Rick: ${user1Read ? 'Leu' : 'Não leu'}
-            </div>`;
-            
-            // Status Usuário 2
-            const user2Read = todayData && todayData.user2_read === 'true';
-            html += `<div class="status-item ${user2Read ? 'read' : 'not-read'}">
-                <span class="check-icon ${user2Read ? 'read' : 'not-read'}">
-                    ${user2Read ? '✓' : '○'}
-                </span>
-                Bruna: ${user2Read ? 'Não leu' : 'Não leu'}
-            </div>`;
-            
-            statusContainer.innerHTML = html;
-            
-            // Atualizar botão
-            const currentUserRead = todayData && todayData[currentUser + '_read'] === 'true';
-            if (currentUserRead) {
-                markBtn.textContent = '✓ Você já leu hoje!';
                 markBtn.disabled = true;
+                markBtn.textContent = 'Carregando...';
                 markBtn.classList.add('btn-secondary');
                 markBtn.classList.remove('btn-success');
-            } else {
-                markBtn.textContent = '✓ Marcar como Lido';
-                markBtn.disabled = false;
-                markBtn.classList.remove('btn-secondary');
-                markBtn.classList.add('btn-success');
+                return;
             }
-            
-            // Verificar se o outro usuário leu
-            checkFriendReadingStatus(todayData);
+
+            const today = new Date().toISOString().split('T')[0];
+            const todayData = readingData.find(r => r.date === today);
+
+            let html = '';
+
+            if (todayData) {
+                 // Status User 1
+                const user1Read = todayData.user1_read === 'TRUE';
+                html += `<div class="status-item ${user1Read ? 'read' : 'not-read'}">
+                    <span class="check-icon ${user1Read ? 'read' : 'not-read'}">
+                        ${user1Read ? '✓' : '○'}
+                    </span>
+                    Rick: ${user1Read ? 'Leu' : 'Não leu'}
+                </div>`;
+
+                // Status User 2
+                const user2Read = todayData.user2_read === 'TRUE';
+                html += `<div class="status-item ${user2Read ? 'read' : 'not-read'}">
+                    <span class="check-icon ${user2Read ? 'read' : 'not-read'}">
+                        ${user2Read ? '✓' : '○'}
+                    </span>
+                    Bruna Diamante: ${user2Read ? 'Leu' : 'Não leu'}
+                </div>`;
+
+                // Update button status
+                const currentUserRead = todayData[currentUser + '_read'] === 'TRUE';
+                if (currentUserRead) {
+                    markBtn.textContent = '✓ Você já leu hoje!';
+                    markBtn.disabled = true;
+                    markBtn.classList.add('btn-secondary');
+                    markBtn.classList.remove('btn-success');
+                } else {
+                    markBtn.textContent = '✓ Marcar como Lido';
+                    markBtn.disabled = false;
+                    markBtn.classList.remove('btn-secondary');
+                    markBtn.classList.add('btn-success');
+                }
+
+                // Check if the other user has read (and notify if needed)
+                checkFriendReadingStatus(todayData);
+
+            } else {
+                 html = '<div class="status-item">Sem status para hoje</div>';
+                 markBtn.textContent = 'Sem leitura para marcar';
+                 markBtn.disabled = true;
+                 markBtn.classList.add('btn-secondary');
+                 markBtn.classList.remove('btn-success');
+            }
+
+
+            statusContainer.innerHTML = html;
         }
-        
+
         function checkFriendReadingStatus(todayData) {
-            if (!todayData) return;
-            
+            if (!todayData || !currentUser) return;
+
             const otherUser = currentUser === 'user1' ? 'user2' : 'user1';
-            const otherUserRead = todayData[otherUser + '_read'] === 'true';
-            const currentUserRead = todayData[currentUser + '_read'] === 'true';
-            
-            // Se o outro usuário leu e eu não recebi notificação ainda hoje
+            const otherUserRead = todayData[otherUser + '_read'] === 'TRUE';
+            const currentUserRead = todayData[currentUser + '_read'] === 'TRUE';
+
+            // If the other user has read and I haven't received a notification today
             const lastNotificationDate = localStorage.getItem('lastFriendNotification');
             const today = new Date().toISOString().split('T')[0];
-            
+
             if (otherUserRead && lastNotificationDate !== today && !currentUserRead) {
-                const otherUserName = otherUser === 'user1' ? 'Rick' : 'Bruna';
+                const otherUserName = otherUser === 'user1' ? 'Rick' : 'Bruna Diamante';
                 showFriendReadNotification(otherUserName);
                 localStorage.setItem('lastFriendNotification', today);
             }
         }
-        
+
         function showFriendReadNotification(friendName) {
             if ('Notification' in window && Notification.permission === 'granted') {
                 new Notification('🎉 Seu amigo já leu!', {
@@ -923,217 +920,373 @@
                     tag: 'friend-read'
                 });
             }
-            
+
             showMessage(`🎉 ${friendName} já fez a leitura de hoje!`, 'success');
         }
-        
+
         function hasReadToday() {
             const today = new Date().toISOString().split('T')[0];
             const todayData = readingData.find(r => r.date === today);
-            return todayData && todayData[currentUser + '_read'] === 'true';
+            return todayData && todayData[currentUser + '_read'] === 'TRUE';
         }
-        
+
         async function markAsRead() {
             if (!currentUser) {
                 showMessage('Selecione seu usuário primeiro.', 'error');
                 return;
             }
-            
+
             const today = new Date().toISOString().split('T')[0];
-            
+            let todayData = readingData.find(r => r.date === today);
+
+            if (!todayData) {
+                 showMessage('Nenhuma leitura programada para hoje.', 'error');
+                 return;
+            }
+
             try {
-                // Encontrar ou criar registro para hoje
-                let todayIndex = readingData.findIndex(r => r.date === today);
-                
-                if (todayIndex === -1) {
-                    // Criar novo registro
-                    const todayReading = getTodayReading();
-                    readingData.push({
-                        date: today,
-                        reading: todayReading,
-                        user1_read: currentUser === 'user1' ? 'true' : 'false',
-                        user2_read: currentUser === 'user2' ? 'true' : 'false'
-                    });
-                } else {
-                    // Atualizar registro existente
-                    readingData[todayIndex][currentUser + '_read'] = 'true';
-                }
-                
-                // Salvar no Google Sheets
+                // Update the local readingData array
+                todayData[currentUser + '_read'] = 'TRUE';
+
+                // Save the updated data back to Google Sheets
                 await updateSheet();
-                
-                // Atualizar interface
+
+                // Update interface
                 updateReadingStatus();
-                renderTable();
-                
+                renderTable(fullView); // Re-render table with current view setting
+
                 showMessage('✓ Leitura marcada como concluída!', 'success');
-                
+
             } catch (error) {
-                showMessage('Erro ao marcar leitura: ' + error.message, 'error');
+                console.error('Erro ao marcar leitura:', error);
+                showMessage('Erro ao marcar leitura: ' + (error.message || 'Erro desconhecido'), 'error');
             }
         }
-        
+
         async function loadData() {
-            const url = document.getElementById('scriptUrl').value;
-            if (!url) {
-                showMessage('Configure a URL do Apps Script primeiro.', 'error');
+            if (!SCRIPT_URL) {
+                showMessage('URL do Apps Script não configurada.', 'error');
                 return;
             }
-            
+
             showLoading(true);
-            
+            document.getElementById('tableContainer').innerHTML = ''; // Clear previous table
+
             try {
-                const response = await fetch(url + '?action=read');
+                const response = await fetch(SCRIPT_URL + '?action=read');
                 const result = await response.json();
-                
-                if (result.success) {
-                    readingData = result.data.slice(1); // Remove header row
+
+                if (result.success && Array.isArray(result.data)) {
+                    // Assuming the first row is header and subsequent rows are data
+                    if (result.data.length > 1) {
+                         const header = result.data[0]; // ['date', 'reading', 'user1_read', 'user2_read']
+                         const dataRows = result.data.slice(1);
+
+                         readingData = dataRows.map(row => {
+                            const obj = {};
+                            header.forEach((key, index) => {
+                                obj[key] = row[index];
+                            });
+                            return obj;
+                         });
+
+                        // Sort data by date
+                        readingData.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+                    } else {
+                        readingData = []; // No data rows found
+                    }
+
+
                     updateTodaySection();
-                    renderTable();
+                    renderTable(fullView); // Render table with current view setting
                     showMessage('Dados carregados com sucesso!', 'success');
+
+                    // Save offline backup
+                    localStorage.setItem('offlineReadingData', JSON.stringify(readingData));
+
                 } else {
-                    throw new Error(result.error || 'Erro desconhecido');
+                    throw new Error(result.error || 'Formato de dados inválido ou erro desconhecido');
                 }
             } catch (error) {
                 console.error('Erro ao carregar dados:', error);
-                showMessage('Erro ao carregar dados. Usando dados offline.', 'error');
-                
-                // Carregar dados offline se disponível
+                showMessage('Erro ao carregar dados. Verifique a URL do Apps Script e a planilha.', 'error');
+
+                // Load offline data if available
                 const offlineData = localStorage.getItem('offlineReadingData');
                 if (offlineData) {
-                    readingData = JSON.parse(offlineData);
-                    updateTodaySection();
-                    renderTable();
+                    try {
+                        readingData = JSON.parse(offlineData);
+                        showMessage('Dados offline carregados.', 'info');
+                        updateTodaySection();
+                        renderTable(fullView); // Render table with current view setting
+                    } catch(e) {
+                        console.error("Error parsing offline data:", e);
+                        readingData = [];
+                        updateTodaySection();
+                        renderTable(fullView); // Render table with current view setting
+                        showMessage('Erro ao carregar dados offline.', 'error');
+                    }
+                } else {
+                     readingData = [];
+                     updateTodaySection();
+                     renderTable(fullView); // Render table with current view setting
                 }
             } finally {
                 showLoading(false);
             }
         }
-        
-        function renderTable() {
+
+        function renderTable(showFull) {
             const container = document.getElementById('tableContainer');
             const today = new Date().toISOString().split('T')[0];
-            
+            const toggleBtn = document.getElementById('toggleViewBtn');
+
             if (readingData.length === 0) {
-                container.innerHTML = '<div style="text-align: center; padding: 2rem; color: #666;">Nenhum dado encontrado. Configure o Apps Script e carregue os dados.</div>';
+                container.innerHTML = '<div style="text-align: center; padding: 2rem; color: #666;">Nenhum dado encontrado na planilha.</div>';
+                toggleBtn.style.display = 'none';
                 return;
             }
-            
-            let html = `
-                <table>
-                    <thead>
-                        <tr>
-                            <th class="date-col">Data</th>
-                            <th class="reading-col">Leitura</th>
-                            <th class="status-col">Rick</th>
-                            <th class="status-col">Bruna</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-            `;
-            
-            // Combinar dados do plano de leitura com dados salvos
-            const sortedPlan = [...bibleReadingPlan].sort((a, b) => new Date(a.date) - new Date(b.date));
-            
-            sortedPlan.forEach(planItem => {
-                const savedData = readingData.find(r => r.date === planItem.date);
-                const isToday = planItem.date === today;
-                
-                const user1Read = savedData && savedData.user1_read === 'true';
-                const user2Read = savedData && savedData.user2_read === 'true';
-                
-                html += `
-                    <tr ${isToday ? 'class="today-row"' : ''}>
-                        <td class="date-col">
-                            ${new Date(planItem.date).toLocaleDateString('pt-BR')}
-                            ${isToday ? '<br><small>HOJE</small>' : ''}
-                        </td>
-                        <td class="reading-col">${planItem.reading}</td>
-                        <td class="status-col">
-                            <span class="check-icon ${user1Read ? 'read' : 'not-read'}">
-                                ${user1Read ? '✓' : '○'}
-                            </span>
-                        </td>
-                        <td class="status-col">
-                            <span class="check-icon ${user2Read ? 'read' : 'not-read'}">
-                                ${user2Read ? '✓' : '○'}
-                            </span>
-                        </td>
-                    </tr>
+
+            let dataToDisplay = readingData;
+
+            if (!showFull) {
+                const todayIndex = readingData.findIndex(item => item.date === today);
+                if (todayIndex !== -1) {
+                    const startIndex = Math.max(0, todayIndex - 3);
+                    const endIndex = Math.min(readingData.length - 1, todayIndex + 6);
+                    dataToDisplay = readingData.slice(startIndex, endIndex + 1);
+                } else {
+                    // If today's reading isn't found, just show the first 10 entries or all if less than 10
+                     dataToDisplay = readingData.slice(0, Math.min(readingData.length, 10));
+                }
+                 toggleBtn.textContent = 'Ver Cronograma Completo'; // Keep this here for initial render
+                 toggleBtn.style.display = 'block'; // Show button to toggle
+            } else {
+                 toggleBtn.textContent = 'Ver Resumo Diário'; // Keep this here for initial render
+                 toggleBtn.style.display = 'block'; // Show button to toggle
+            }
+
+            if (showFull) {
+                // Group data by book for full view
+                const groupedData = dataToDisplay.reduce((acc, item) => {
+                    // Extract book name (assuming format "Book Chapter")
+                    const parts = item.reading.split(' ');
+                    const book = parts.slice(0, -1).join(' '); // Take all parts except the last one as book name
+                    if (!acc[book]) {
+                        acc[book] = [];
+                    }
+                    acc[book].push(item);
+                    return acc;
+                }, {});
+
+                let html = '';
+                for (const book in groupedData) {
+                    html += `
+                        <div class="book-group">
+                            <div class="book-header" onclick="toggleBook(this)">
+                                ${book} <span class="toggle-icon">▶</span>
+                            </div>
+                            <div class="book-content">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th class="date-col">Data</th>
+                                            <th class="reading-col">Leitura</th>
+                                            <th class="status-col">Rick</th>
+                                            <th class="status-col">Bruna Diamante</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                    `;
+                    groupedData[book].forEach(item => {
+                        const isToday = item.date === today;
+                        const user1Read = item.user1_read === 'TRUE';
+                        const user2Read = item.user2_read === 'TRUE';
+                        html += `
+                            <tr ${isToday ? 'class="today-row"' : ''}>
+                                <td class="date-col">
+                                    ${new Date(item.date + 'T00:00:00').toLocaleDateString('pt-BR')}
+                                    ${isToday ? '<br><small>HOJE</small>' : ''}
+                                </td>
+                                <td class="reading-col">${item.reading}</td>
+                                <td class="status-col">
+                                    <span class="check-icon ${user1Read ? 'read' : 'not-read'}">
+                                        ${user1Read ? '✓' : '○'}
+                                    </span>
+                                </td>
+                                <td class="status-col">
+                                    <span class="check-icon ${user2Read ? 'read' : 'not-read'}">
+                                        ${user2Read ? '✓' : '○'}
+                                    </span>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                    html += `
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    `;
+                }
+                container.innerHTML = html;
+
+            } else {
+                 // Render the limited table view
+                let html = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="date-col">Data</th>
+                                <th class="reading-col">Leitura</th>
+                                <th class="status-col">Rick</th>
+                                <th class="status-col">Bruna Diamante</th>
+                            </tr>
+                        </thead>
+                        <tbody>
                 `;
-            });
-            
-            html += '</tbody></table>';
-            container.innerHTML = html;
+
+                dataToDisplay.forEach(item => {
+                    const isToday = item.date === today;
+                    const user1Read = item.user1_read === 'TRUE';
+                    const user2Read = item.user2_read === 'TRUE';
+
+                    html += `
+                        <tr ${isToday ? 'class="today-row"' : ''}>
+                            <td class="date-col">
+                                ${new Date(item.date + 'T00:00:00').toLocaleDateString('pt-BR')}
+                                ${isToday ? '<br><small>HOJE</small>' : ''}
+                            </td>
+                            <td class="reading-col">${item.reading}</td>
+                            <td class="status-col">
+                                <span class="check-icon ${user1Read ? 'read' : 'not-read'}">
+                                    ${user1Read ? '✓' : '○'}
+                                </span>
+                            </td>
+                            <td class="status-col">
+                                <span class="check-icon ${user2Read ? 'read' : 'not-read'}">
+                                    ${user2Read ? '✓' : '○'}
+                                </span>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                html += '</tbody></table>';
+                container.innerHTML = html;
+            }
         }
-        
+
+        function toggleTableView() {
+            fullView = !fullView;
+            const toggleBtn = document.getElementById('toggleViewBtn');
+            if (fullView) {
+                toggleBtn.textContent = 'Ver Resumo Diário';
+            } else {
+                toggleBtn.textContent = 'Ver Cronograma Completo';
+            }
+            renderTable(fullView);
+        }
+
+        function toggleBook(headerElement) {
+            const contentElement = headerElement.nextElementSibling;
+            const toggleIcon = headerElement.querySelector('.toggle-icon');
+            if (contentElement.classList.contains('expanded')) {
+                contentElement.classList.remove('expanded');
+                headerElement.classList.add('collapsed');
+                toggleIcon.style.transform = 'rotate(0deg)';
+            } else {
+                contentElement.classList.add('expanded');
+                 headerElement.classList.remove('collapsed');
+                 toggleIcon.style.transform = 'rotate(90deg)';
+            }
+        }
+
+
         async function updateSheet() {
-            const url = document.getElementById('scriptUrl').value;
-            
-            // Preparar dados para envio (incluir header)
+            if (!SCRIPT_URL) {
+                showMessage('URL do Apps Script não configurada.', 'error');
+                return;
+            }
+
+             if (readingData.length === 0) {
+                 showMessage('Nenhum dado para salvar na planilha.', 'info');
+                 return;
+             }
+
+            // Prepare data for sending (include header)
             const dataToSend = [
                 ['date', 'reading', 'user1_read', 'user2_read'],
                 ...readingData.map(row => [row.date, row.reading, row.user1_read, row.user2_read])
             ];
-            
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    action: 'write',
-                    data: dataToSend
-                })
-            });
-            
-            const result = await response.json();
-            
-            if (!result.success) {
-                throw new Error(result.error || 'Erro ao atualizar planilha');
+
+            try {
+                 const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'write',
+                        data: dataToSend
+                    })
+                });
+
+                const result = await response.json();
+
+                if (!result.success) {
+                    throw new Error(result.error || 'Erro ao atualizar planilha');
+                }
+
+                // Save offline backup on successful write
+                localStorage.setItem('offlineReadingData', JSON.stringify(readingData));
+
+            } catch (error) {
+                 console.error('Erro ao atualizar planilha:', error);
+                 showMessage('Erro ao salvar dados na planilha: ' + (error.message || 'Erro desconhecido'), 'error');
+                 throw error; // Re-throw to be caught by markAsRead
             }
-            
-            // Salvar offline backup
-            localStorage.setItem('offlineReadingData', JSON.stringify(readingData));
         }
-        
+
         function showLoading(show) {
             document.getElementById('loadingTable').classList.toggle('hidden', !show);
         }
-        
+
         function showMessage(text, type = 'info') {
             const messageDiv = document.getElementById('message');
             messageDiv.className = 'message ' + type;
             messageDiv.textContent = text;
             messageDiv.style.display = 'block';
-            
+
             setTimeout(() => {
                 messageDiv.style.display = 'none';
             }, 5000);
         }
-        
-        // Verificar novos dados periodicamente quando online
+
+        // Fetch new data periodically when online
         setInterval(() => {
             if (navigator.onLine && currentUser) {
                 loadData();
             }
-        }, 5 * 60 * 1000); // A cada 5 minutos
-        
-        // Limpar notificações antigas no início do dia
+        }, 5 * 60 * 1000); // Every 5 minutes
+
+        // Clear old notifications at the start of the day
         function clearDailyNotifications() {
             const today = new Date().toISOString().split('T')[0];
             const lastClear = localStorage.getItem('lastNotificationClear');
-            
+
             if (lastClear !== today) {
                 localStorage.removeItem('lastFriendNotification');
+                localStorage.removeItem('lastReminderDate'); // Also clear reminder trigger date
                 localStorage.setItem('lastNotificationClear', today);
             }
         }
-        
-        // Executar limpeza na inicialização
+
+        // Execute cleanup on initialization
         clearDailyNotifications();
-        
-        // Verificar notificações pendentes a cada hora
+
+        // Check pending notifications every hour
         setInterval(clearDailyNotifications, 60 * 60 * 1000);
     </script>
 </body>
