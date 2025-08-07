@@ -15,7 +15,7 @@
         * {
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
+            box-sizing: border;
         }
 
         body {
@@ -160,6 +160,14 @@
         .btn-success:hover {
             background: #218838;
         }
+         .btn-danger {
+            background: #dc3545;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
 
         .today-reading {
             text-align: center;
@@ -173,9 +181,31 @@
             margin-bottom: 1rem;
         }
 
+        .today-date-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 2rem;
+        }
+
+        .today-date-container button {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            color: #8B4513;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .today-date-container button:disabled {
+            color: #ccc;
+            cursor: not-allowed;
+        }
+
+
         .today-date {
             color: #666;
-            margin-bottom: 2rem;
         }
 
         .reading-status {
@@ -247,7 +277,7 @@
         }
 
         .reading-col {
-            width: 200px;
+            width: 100px;
         }
 
         .status-col {
@@ -567,10 +597,16 @@
             </div>
             <div class="section-content">
                 <div class="today-reading">
-                    <div class="today-date" id="todayDate"></div>
+                    <div class="today-date-container">
+                         <button onclick="navigateDate(-1)" id="prevDayBtn">◀</button>
+                         <span class="today-date" id="todayDate"></span>
+                         <button onclick="navigateDate(1)" id="nextDayBtn">▶</button>
+                         <button onclick="openCalendar()" id="calendarBtn">📅</button>
+                         <input type="date" id="datePicker" style="display:none;">
+                    </div>
                     <div class="today-verse" id="todayVerse">Carregando...</div>
                     <div class="reading-status" id="readingStatus"></div>
-                    <button class="btn btn-success mark-read-btn" onclick="markAsRead()" id="markReadBtn">
+                    <button class="btn mark-read-btn" onclick="toggleReadStatus()" id="markReadBtn">
                         ✓ Marcar como Lido
                     </button>
                 </div>
@@ -580,10 +616,10 @@
         <!-- Tabela de Leituras -->
         <div class="section" id="tableSection" style="display: none;">
             <div class="section-header">
-                📋 Cronograma de Leituras
+                📋 Cronograma
                 <div style="margin-left: auto; display: flex; gap: 10px;">
                     <button class="btn btn-secondary" onclick="loadData()">🔄 Atualizar</button>
-                     <button class="btn btn-secondary" id="toggleViewBtn" onclick="toggleTableView()">Ver Cronograma Completo</button>
+                     <button class="btn btn-secondary" id="toggleViewBtn" onclick="toggleTableView()">Cronograma Completo</button>
                 </div>
             </div>
             <div class="section-content">
@@ -631,7 +667,8 @@
         let reminderInterval = null;
         let deferredPrompt = null;
         let fullView = false; // State to track table view
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwpyBfUfH-_aWC58N-vSXE1VxlZkQA9g21E-Dw0XBcytACgzp8pVHqKEF7kM8IkjtRR/exec"; // Your Google Apps Script URL
+        let currentDate = new Date(); // Keep track of the date being displayed in "Today's Reading"
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx4dBQHTf-n4g8ZcX1mtZrGNFFOCxeR2bkE3A6eIjuY_EWbizos7YO7G5jl8DlMYXaanw/exec"; // Your Google Apps Script URL
 
         // PWA Installation
         window.addEventListener('beforeinstallprompt', (e) => {
@@ -689,6 +726,17 @@
 
             // Check active reminder
             checkActiveReminder();
+
+            // Set up date picker listener
+            document.getElementById('datePicker').addEventListener('change', (event) => {
+                const selectedDate = new Date(event.target.value + 'T00:00:00'); // Ensure correct timezone handling
+                if (!isNaN(selectedDate.getTime())) {
+                    currentDate = selectedDate;
+                    updateTodaySection(); // Update the section with the selected date's data
+                } else {
+                    showMessage('Data inválida selecionada.', 'error');
+                }
+            });
         });
 
         function selectUser(userId) {
@@ -742,7 +790,7 @@
                 const today = new Date().toISOString().split('T')[0];
 
                 if (nowHours === hours && nowMinutes === minutes && lastReminderDate !== today) {
-                     if (!hasReadToday()) {
+                     if (!hasReadToday(new Date())) { // Check for the actual today's reading
                         showReadingReminder();
                         localStorage.setItem('lastReminderDate', today); // Mark reminder as triggered for today
                     }
@@ -786,7 +834,7 @@
         function snoozeReminder() {
             dismissNotification();
             setTimeout(() => {
-                if (!hasReadToday()) {
+                if (!hasReadToday(new Date())) { // Check for the actual today's reading
                     showReadingReminder();
                 }
             }, 60 * 60 * 1000); // 1 hour
@@ -795,7 +843,7 @@
 
         function markAsReadFromNotification() {
             dismissNotification();
-            markAsRead();
+            toggleReadStatus(); // Call the main toggleReadStatus function
         }
 
         function dismissNotification() {
@@ -803,12 +851,13 @@
         }
 
         function updateTodaySection() {
-            const today = new Date();
-            const todayStr = today.toISOString().split('T')[0];
+            const dateToDisplay = currentDate;
+            const dateStr = dateToDisplay.toISOString().split('T')[0];
+            const todayActualStr = new Date().toISOString().split('T')[0];
 
-            // Update date
+            // Update date display
             document.getElementById('todayDate').textContent =
-                today.toLocaleDateString('pt-BR', {
+                dateToDisplay.toLocaleDateString('pt-BR', {
                     weekday: 'long',
                     year: 'numeric',
                     month: 'long',
@@ -816,39 +865,69 @@
                 });
 
             // Update today's reading and status based on fetched data
-            const todayData = readingData.find(r => r.date === todayStr);
+            const dataForDate = readingData.find(r => r.date === dateStr);
+            const todayVerseElement = document.getElementById('todayVerse');
+            const markBtn = document.getElementById('markReadBtn');
 
-            if (todayData) {
-                document.getElementById('todayVerse').textContent = todayData.reading;
+
+            if (dataForDate) {
+                todayVerseElement.textContent = dataForDate.reading;
+                 markBtn.style.display = 'block'; // Always show the button if there's data
+                 // Re-evaluate button state based on reading status for the displayed date
+                 const currentUserRead = String(dataForDate[currentUser + '_read']).trim().toUpperCase() === 'TRUE';
+                 if (currentUserRead) {
+                    markBtn.textContent = '✓ Marcar como Não Lido';
+                    markBtn.classList.add('btn-danger');
+                    markBtn.classList.remove('btn-success');
+                 } else {
+                    markBtn.textContent = '✓ Marcar como Lido';
+                    markBtn.classList.remove('btn-danger');
+                    markBtn.classList.add('btn-success');
+                 }
+                 markBtn.disabled = false; // Enable the button
             } else {
-                document.getElementById('todayVerse').textContent = 'Sem leitura programada para hoje';
+                todayVerseElement.textContent = 'Sem leitura programada para esta data';
+                markBtn.style.display = 'none'; // Hide button if no data
             }
 
             // Update reading status indicators
-            updateReadingStatus();
+            updateReadingStatus(dateStr);
+
+             // Disable previous/next buttons if at the start/end of data
+            const prevDayBtn = document.getElementById('prevDayBtn');
+            const nextDayBtn = document.getElementById('nextDayBtn');
+            const firstDate = readingData.length > 0 ? readingData[0].date : null;
+            const lastDate = readingData.length > 0 ? readingData[readingData.length - 1].date : null;
+
+            if (firstDate && dateStr <= firstDate) {
+                prevDayBtn.disabled = true;
+            } else {
+                prevDayBtn.disabled = false;
+            }
+
+            if (lastDate && dateStr >= lastDate) {
+                nextDayBtn.disabled = true;
+            } else {
+                nextDayBtn.disabled = false;
+            }
         }
 
-        function updateReadingStatus() {
+        function updateReadingStatus(dateStr) {
             const statusContainer = document.getElementById('readingStatus');
-            const markBtn = document.getElementById('markReadBtn');
 
             if (readingData.length === 0) {
                 statusContainer.innerHTML = '<div class="status-item">Carregando status...</div>';
-                markBtn.disabled = true;
-                markBtn.textContent = 'Carregando...';
-                markBtn.classList.add('btn-secondary');
-                markBtn.classList.remove('btn-success');
                 return;
             }
 
-            const today = new Date().toISOString().split('T')[0];
-            const todayData = readingData.find(r => r.date === today);
+            const dataForDate = readingData.find(r => r.date === dateStr);
 
             let html = '';
 
-            if (todayData) {
+            if (dataForDate) {
                  // Status User 1
-                const user1Read = todayData.user1_read === 'TRUE';
+                // Check for 'TRUE' string specifically, case-insensitive and trimmed
+                const user1Read = String(dataForDate.user1_read).trim().toUpperCase() === 'TRUE';
                 html += `<div class="status-item ${user1Read ? 'read' : 'not-read'}">
                     <span class="check-icon ${user1Read ? 'read' : 'not-read'}">
                         ${user1Read ? '✓' : '○'}
@@ -857,7 +936,8 @@
                 </div>`;
 
                 // Status User 2
-                const user2Read = todayData.user2_read === 'TRUE';
+                 // Check for 'TRUE' string specifically, case-insensitive and trimmed
+                const user2Read = String(dataForDate.user2_read).trim().toUpperCase() === 'TRUE';
                 html += `<div class="status-item ${user2Read ? 'read' : 'not-read'}">
                     <span class="check-icon ${user2Read ? 'read' : 'not-read'}">
                         ${user2Read ? '✓' : '○'}
@@ -865,41 +945,31 @@
                     Bruna Diamante: ${user2Read ? 'Leu' : 'Não leu'}
                 </div>`;
 
-                // Update button status
-                const currentUserRead = todayData[currentUser + '_read'] === 'TRUE';
-                if (currentUserRead) {
-                    markBtn.textContent = '✓ Você já leu hoje!';
-                    markBtn.disabled = true;
-                    markBtn.classList.add('btn-secondary');
-                    markBtn.classList.remove('btn-success');
-                } else {
-                    markBtn.textContent = '✓ Marcar como Lido';
-                    markBtn.disabled = false;
-                    markBtn.classList.remove('btn-secondary');
-                    markBtn.classList.add('btn-success');
+                // Check if the other user has read (and notify if needed), but ONLY for today's actual date
+                const todayActualStr = new Date().toISOString().split('T')[0];
+                if (dateStr === todayActualStr) {
+                     checkFriendReadingStatus(dataForDate);
                 }
 
-                // Check if the other user has read (and notify if needed)
-                checkFriendReadingStatus(todayData);
 
             } else {
-                 html = '<div class="status-item">Sem status para hoje</div>';
-                 markBtn.textContent = 'Sem leitura para marcar';
-                 markBtn.disabled = true;
-                 markBtn.classList.add('btn-secondary');
-                 markBtn.classList.remove('btn-success');
+                 html = '<div class="status-item">Sem status para esta data</div>';
             }
-
 
             statusContainer.innerHTML = html;
         }
 
-        function checkFriendReadingStatus(todayData) {
-            if (!todayData || !currentUser) return;
+        function checkFriendReadingStatus(dateData) {
+            if (!dateData || !currentUser) return;
+
+             // Only check and notify for the actual today's date
+            const todayActualStr = new Date().toISOString().split('T')[0];
+            if (dateData.date !== todayActualStr) return;
+
 
             const otherUser = currentUser === 'user1' ? 'user2' : 'user1';
-            const otherUserRead = todayData[otherUser + '_read'] === 'TRUE';
-            const currentUserRead = todayData[currentUser + '_read'] === 'TRUE';
+            const otherUserRead = String(dateData[otherUser + '_read']).trim().toUpperCase() === 'TRUE';
+            const currentUserRead = String(dateData[currentUser + '_read']).trim().toUpperCase() === 'TRUE';
 
             // If the other user has read and I haven't received a notification today
             const lastNotificationDate = localStorage.getItem('lastFriendNotification');
@@ -924,44 +994,74 @@
             showMessage(`🎉 ${friendName} já fez a leitura de hoje!`, 'success');
         }
 
-        function hasReadToday() {
-            const today = new Date().toISOString().split('T')[0];
-            const todayData = readingData.find(r => r.date === today);
-            return todayData && todayData[currentUser + '_read'] === 'TRUE';
+        function hasReadToday(date) {
+             const dateStr = date.toISOString().split('T')[0];
+            const todayData = readingData.find(r => r.date === dateStr);
+            return todayData && String(todayData[currentUser + '_read']).trim().toUpperCase() === 'TRUE';
         }
 
-        async function markAsRead() {
+        async function toggleReadStatus() {
             if (!currentUser) {
                 showMessage('Selecione seu usuário primeiro.', 'error');
                 return;
             }
 
-            const today = new Date().toISOString().split('T')[0];
-            let todayData = readingData.find(r => r.date === today);
+            const dateToUpdate = currentDate.toISOString().split('T')[0];
+            let dataToUpdate = readingData.find(r => r.date === dateToUpdate);
 
-            if (!todayData) {
-                 showMessage('Nenhuma leitura programada para hoje.', 'error');
+            if (!dataToUpdate) {
+                 showMessage('Nenhuma leitura programada para esta data.', 'error');
                  return;
             }
 
+            // Use the more robust check
+            const isCurrentlyRead = String(dataToUpdate[currentUser + '_read']).trim().toUpperCase() === 'TRUE';
+            const newStatus = isCurrentlyRead ? 'FALSE' : 'TRUE';
+
             try {
-                // Update the local readingData array
-                todayData[currentUser + '_read'] = 'TRUE';
+                console.log('toggleReadStatus: Attempting to toggle reading status.');
+                console.log(`toggleReadStatus: Date: ${dateToUpdate}, User: ${currentUser}, New Status: ${newStatus}`);
 
-                // Save the updated data back to Google Sheets
-                await updateSheet();
+                // Find the index of the data to update locally
+                const dataIndex = readingData.findIndex(r => r.date === dateToUpdate);
 
-                // Update interface
-                updateReadingStatus();
-                renderTable(fullView); // Re-render table with current view setting
+                if (dataIndex !== -1) {
+                    // Update the local readingData array immediately for perceived speed
+                    readingData[dataIndex][currentUser + '_read'] = newStatus;
+                    console.log("toggleReadStatus: Local readingData updated:", readingData[dataIndex]);
 
-                showMessage('✓ Leitura marcada como concluída!', 'success');
+                    // Update the UI based on the locally updated data
+                    updateReadingStatus(dateToUpdate);
+                    updateTodaySection(); // Update button state
+                    renderTable(fullView); // Re-render table with current view setting
+
+
+                     // Send update request to Google Apps Script for this specific entry
+                    await updateSheetEntry(dateToUpdate, currentUser, newStatus);
+                    console.log("toggleReadStatus: Sheet update initiated.");
+
+                    // After successful sheet update, reload data to ensure consistency
+                    // This will also trigger UI updates, but the initial local update makes it feel faster.
+                    await loadData();
+                    console.log("toggleReadStatus: Data reloaded after sheet update.");
+
+
+                } else {
+                    console.error("toggleReadStatus: Could not find data for the displayed date in readingData array.");
+                    showMessage('Erro interno: dados da data exibida não encontrados localmente.', 'error');
+                    return;
+                }
+
+                showMessage(`✓ Leitura marcada como ${newStatus === 'TRUE' ? 'concluída' : 'não lida'}!`, 'success');
 
             } catch (error) {
-                console.error('Erro ao marcar leitura:', error);
+                console.error('toggleReadStatus: Erro ao marcar leitura:', error);
                 showMessage('Erro ao marcar leitura: ' + (error.message || 'Erro desconhecido'), 'error');
+                // If sheet update fails, potentially revert the local change or show a warning
+                // For now, we'll just show the error message.
             }
         }
+
 
         async function loadData() {
             if (!SCRIPT_URL) {
@@ -973,8 +1073,18 @@
             document.getElementById('tableContainer').innerHTML = ''; // Clear previous table
 
             try {
+                console.log("loadData: Fetching data from Google Apps Script...");
                 const response = await fetch(SCRIPT_URL + '?action=read');
+                console.log("loadData: Fetch response received.");
+
+                if (!response.ok) {
+                     const errorText = await response.text();
+                     console.error("loadData: HTTP error response text:", errorText);
+                     throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
                 const result = await response.json();
+                console.log("loadData: Data fetch result:", result);
 
                 if (result.success && Array.isArray(result.data)) {
                     // Assuming the first row is header and subsequent rows are data
@@ -992,25 +1102,47 @@
 
                         // Sort data by date
                         readingData.sort((a, b) => new Date(a.date) - new Date(b.date));
+                        console.log("loadData: Reading data loaded and sorted:", readingData);
+
 
                     } else {
                         readingData = []; // No data rows found
+                        console.log("loadData: No data rows found in sheet.");
                     }
 
+                    // Set currentDate to today after loading data, but only if it's the initial load
+                    // or if the current displayed date is no longer in the loaded data
+                    const todayActualStr = new Date().toISOString().split('T')[0];
+                    const isCurrentDateInLoadedData = readingData.some(item => item.date === currentDate.toISOString().split('T')[0]);
 
-                    updateTodaySection();
+                    if (readingData.length > 0 && !isCurrentDateInLoadedData) {
+                        // If current date is not in data, set to today or first date available
+                         currentDate = new Date(readingData[0].date + 'T00:00:00');
+                         console.log("loadData: Current date not in data, setting to first available date:", currentDate.toISOString().split('T')[0]);
+                    } else if (readingData.length === 0) {
+                         currentDate = new Date(); // Default to today if no data
+                         console.log("loadData: No data, setting current date to today:", currentDate.toISOString().split('T')[0]);
+                    } else {
+                         console.log("loadData: Current date is valid and in data, keeping:", currentDate.toISOString().split('T')[0]);
+                    }
+                     // If currentDate was already valid and in data, keep it.
+
+
+                    updateTodaySection(); // Update UI with the determined date
                     renderTable(fullView); // Render table with current view setting
                     showMessage('Dados carregados com sucesso!', 'success');
 
                     // Save offline backup
                     localStorage.setItem('offlineReadingData', JSON.stringify(readingData));
+                    console.log("loadData: Offline data saved.");
 
                 } else {
+                    console.error("loadData: Data fetch result indicates failure:", result);
                     throw new Error(result.error || 'Formato de dados inválido ou erro desconhecido');
                 }
             } catch (error) {
-                console.error('Erro ao carregar dados:', error);
-                showMessage('Erro ao carregar dados. Verifique a URL do Apps Script e a planilha.', 'error');
+                console.error('loadData: Erro ao carregar dados:', error);
+                showMessage('Erro ao carregar dados. Verifique a URL do Apps Script e a planilha. Detalhes: ' + (error.message || 'Erro desconhecido'), 'error');
 
                 // Load offline data if available
                 const offlineData = localStorage.getItem('offlineReadingData');
@@ -1018,22 +1150,29 @@
                     try {
                         readingData = JSON.parse(offlineData);
                         showMessage('Dados offline carregados.', 'info');
-                        updateTodaySection();
+                         // Set currentDate to today after loading offline data
+                        currentDate = new Date(); // Default to today
+                        updateTodaySection(); // Update UI with today's date initially
                         renderTable(fullView); // Render table with current view setting
+                         console.log("loadData: Offline data parsed and loaded.");
                     } catch(e) {
-                        console.error("Error parsing offline data:", e);
+                        console.error("loadData: Error parsing offline data:", e);
                         readingData = [];
-                        updateTodaySection();
-                        renderTable(fullView); // Render table with current view setting
+                        currentDate = new Date(); // Still set current date to today
+                        updateTodaySection(); // Update UI
+                        renderTable(fullView); // Render table
                         showMessage('Erro ao carregar dados offline.', 'error');
                     }
                 } else {
                      readingData = [];
-                     updateTodaySection();
-                     renderTable(fullView); // Render table with current view setting
+                     currentDate = new Date(); // Still set current date to today
+                     updateTodaySection(); // Update UI
+                     renderTable(fullView); // Render table
+                     console.log("loadData: No offline data available.");
                 }
             } finally {
                 showLoading(false);
+                 console.log("loadData: Loading finished.");
             }
         }
 
@@ -1042,9 +1181,14 @@
             const today = new Date().toISOString().split('T')[0];
             const toggleBtn = document.getElementById('toggleViewBtn');
 
+            console.log("renderTable: Rendering table. showFull:", showFull);
+            console.log("renderTable: Data to render:", readingData);
+
+
             if (readingData.length === 0) {
                 container.innerHTML = '<div style="text-align: center; padding: 2rem; color: #666;">Nenhum dado encontrado na planilha.</div>';
                 toggleBtn.style.display = 'none';
+                console.log("renderTable: No reading data, showing empty message.");
                 return;
             }
 
@@ -1056,15 +1200,18 @@
                     const startIndex = Math.max(0, todayIndex - 3);
                     const endIndex = Math.min(readingData.length - 1, todayIndex + 6);
                     dataToDisplay = readingData.slice(startIndex, endIndex + 1);
+                     console.log("renderTable: Showing daily summary view.");
                 } else {
                     // If today's reading isn't found, just show the first 10 entries or all if less than 10
                      dataToDisplay = readingData.slice(0, Math.min(readingData.length, 10));
+                     console.log("renderTable: Today's reading not found, showing first few entries.");
                 }
-                 toggleBtn.textContent = 'Ver Cronograma Completo'; // Keep this here for initial render
+                 toggleBtn.textContent = 'Cronograma Completo'; // Keep this here for initial render
                  toggleBtn.style.display = 'block'; // Show button to toggle
             } else {
-                 toggleBtn.textContent = 'Ver Resumo Diário'; // Keep this here for initial render
+                 toggleBtn.textContent = 'Resumo Diário'; // Keep this here for initial render
                  toggleBtn.style.display = 'block'; // Show button to toggle
+                 console.log("renderTable: Showing full schedule view.");
             }
 
             if (showFull) {
@@ -1101,8 +1248,9 @@
                     `;
                     groupedData[book].forEach(item => {
                         const isToday = item.date === today;
-                        const user1Read = item.user1_read === 'TRUE';
-                        const user2Read = item.user2_read === 'TRUE';
+                        // Use the more robust check for table rendering too
+                        const user1Read = String(item.user1_read).trim().toUpperCase() === 'TRUE';
+                        const user2Read = String(item.user2_read).trim().toUpperCase() === 'TRUE';
                         html += `
                             <tr ${isToday ? 'class="today-row"' : ''}>
                                 <td class="date-col">
@@ -1131,6 +1279,7 @@
                     `;
                 }
                 container.innerHTML = html;
+                 console.log("renderTable: Full table HTML generated.");
 
             } else {
                  // Render the limited table view
@@ -1149,8 +1298,9 @@
 
                 dataToDisplay.forEach(item => {
                     const isToday = item.date === today;
-                    const user1Read = item.user1_read === 'TRUE';
-                    const user2Read = item.user2_read === 'TRUE';
+                    // Use the more robust check for table rendering too
+                    const user1Read = String(item.user1_read).trim().toUpperCase() === 'TRUE';
+                    const user2Read = String(item.user2_read).trim().toUpperCase() === 'TRUE';
 
                     html += `
                         <tr ${isToday ? 'class="today-row"' : ''}>
@@ -1175,6 +1325,7 @@
 
                 html += '</tbody></table>';
                 container.innerHTML = html;
+                 console.log("renderTable: Summary table HTML generated.");
             }
         }
 
@@ -1182,9 +1333,9 @@
             fullView = !fullView;
             const toggleBtn = document.getElementById('toggleViewBtn');
             if (fullView) {
-                toggleBtn.textContent = 'Ver Resumo Diário';
+                toggleBtn.textContent = 'Resumo Diário';
             } else {
-                toggleBtn.textContent = 'Ver Cronograma Completo';
+                toggleBtn.textContent = 'Cronograma Completo';
             }
             renderTable(fullView);
         }
@@ -1203,23 +1354,57 @@
             }
         }
 
+        function navigateDate(days) {
+            const newDate = new Date(currentDate);
+            newDate.setDate(newDate.getDate() + days);
 
-        async function updateSheet() {
+            // Find the closest available date in readingData
+            const newDateStr = newDate.toISOString().split('T')[0];
+            const closestData = readingData.find(item => item.date === newDateStr);
+
+            if (closestData) {
+                 currentDate = new Date(closestData.date + 'T00:00:00'); // Update currentDate to the found date's date
+                 updateTodaySection();
+            } else {
+                // If the exact date is not found, find the next/previous available date
+                let targetDate = new Date(newDate);
+                let foundDateData = null;
+                let searchLimit = 365; // Limit search to prevent infinite loops
+
+                while (searchLimit > 0) {
+                    targetDate.setDate(targetDate.getDate() + (days > 0 ? 1 : -1));
+                    const targetDateStr = targetDate.toISOString().split('T')[0];
+                    foundDateData = readingData.find(item => item.date === targetDateStr);
+                    if (foundDateData) {
+                        currentDate = new Date(foundDateData.date + 'T00:00:00'); // Update currentDate
+                        updateTodaySection();
+                        break;
+                    }
+                    searchLimit--;
+                }
+
+                if (!foundDateData) {
+                    showMessage('Nenhuma leitura encontrada nesta direção.', 'info');
+                }
+            }
+        }
+
+        function openCalendar() {
+             document.getElementById('datePicker').click(); // Trigger the hidden date input
+        }
+
+
+        async function updateSheetEntry(date, user, status) {
             if (!SCRIPT_URL) {
                 showMessage('URL do Apps Script não configurada.', 'error');
                 return;
             }
 
-             if (readingData.length === 0) {
-                 showMessage('Nenhum dado para salvar na planilha.', 'info');
-                 return;
-             }
+            console.log('updateSheetEntry: Sending update request.');
+            console.log(`updateSheetEntry: URL: ${SCRIPT_URL}`);
+            console.log(`updateSheetEntry: Method: POST`);
+            console.log(`updateSheetEntry: Body: ${JSON.stringify({ action: 'markRead', date: date, user: user, status: status })}`);
 
-            // Prepare data for sending (include header)
-            const dataToSend = [
-                ['date', 'reading', 'user1_read', 'user2_read'],
-                ...readingData.map(row => [row.date, row.reading, row.user1_read, row.user2_read])
-            ];
 
             try {
                  const response = await fetch(SCRIPT_URL, {
@@ -1228,26 +1413,57 @@
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        action: 'write',
-                        data: dataToSend
+                        action: 'markRead', // Action in Apps Script
+                        date: date,
+                        user: user,
+                        status: status // Send the new status
                     })
                 });
 
-                const result = await response.json();
+                console.log("updateSheetEntry: Fetch response received.");
+                console.log("updateSheetEntry: Response status:", response.status);
+                console.log("updateSheetEntry: Response OK:", response.ok);
 
-                if (!result.success) {
-                    throw new Error(result.error || 'Erro ao atualizar planilha');
+
+                if (!response.ok) {
+                     const errorText = await response.text();
+                     console.error("updateSheetEntry: HTTP error response text:", errorText);
+                     throw new Error(`HTTP error! status: ${response.status}, Response: ${errorText}`);
                 }
 
-                // Save offline backup on successful write
-                localStorage.setItem('offlineReadingData', JSON.stringify(readingData));
+                const result = await response.json();
+                console.log("updateSheetEntry: Update response result:", result);
+
+
+                if (!result.success) {
+                    console.error("updateSheetEntry: Update result indicates failure:", result.error);
+                    throw new Error(result.error || 'Erro ao atualizar entrada na planilha');
+                }
+
+                 console.log("updateSheetEntry: Sheet update successful.");
+                 // After successful sheet update, reload data to ensure consistency
+                 // This is already triggered, but ensuring it happens after the local update is key.
+                 // await loadData(); // loadData is called within toggleReadStatus now.
+
 
             } catch (error) {
-                 console.error('Erro ao atualizar planilha:', error);
-                 showMessage('Erro ao salvar dados na planilha: ' + (error.message || 'Erro desconhecido'), 'error');
-                 throw error; // Re-throw to be caught by markAsRead
+                console.error('updateSheetEntry: Erro ao atualizar entrada na planilha:', error);
+                showMessage('Erro ao salvar dados na planilha: ' + (error.message || 'Erro desconhecido'), 'error');
+                throw error; // Re-throw to be caught by toggleReadStatus
             }
         }
+
+
+        // Modified updateSheet function (keeping it for potential future use, but toggleReadStatus now uses updateSheetEntry)
+        async function updateSheet() {
+             // This function is now less critical for marking a single entry,
+             // but could be used for bulk updates if needed later.
+             // For now, loadData fetches the source of truth from the sheet.
+             console.log("updateSheet function called, but not the primary method for marking read.");
+             // Re-fetch data to ensure UI reflects the latest state from the sheet.
+             await loadData();
+        }
+
 
         function showLoading(show) {
             document.getElementById('loadingTable').classList.toggle('hidden', !show);
