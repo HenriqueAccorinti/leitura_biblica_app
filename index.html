@@ -599,7 +599,7 @@
                 });
 
             // Update today's reading and status based on fetched data
-            const dataForDate = readingData.find(r => item => item.date === dateStr); /* Corrected find condition */
+            const dataForDate = readingData.find(r => r.date === dateStr);
             const todayVerseElement = document.getElementById('todayVerse');
             const markBtn = document.getElementById('markReadBtn');
 
@@ -726,15 +726,16 @@
                     readingData[dataIndex][currentUser + '_read'] = newStatus;
                     console.log("toggleReadStatus: Local readingData updated:", readingData[dataIndex]);
 
-                    // Update the UI based on the locally updated data
+                    // Update the UI based on the locally updated data immediately
                     updateReadingStatus(dateToUpdate);
-                    updateTodaySection(); // Update button state
+                    updateTodaySection(); // Update button state based on the new local data
 
 
                      // Send update request to Google Apps Script for this specific entry (without awaiting)
                     updateSheetEntry(dateToUpdate, currentUser, newStatus).then(() => {
                         console.log("toggleReadStatus: Sheet update finished.");
                         // After successful sheet update, reload data in the background to ensure consistency
+                        // This will also update the UI again if needed, but should be quick as UI is already updated
                         loadData();
                     }).catch(error => {
                          console.error('toggleReadStatus: Error during sheet update:', error);
@@ -953,7 +954,7 @@
 
               console.log("updateSheetEntry: Update successful.");
               // After successful sheet update, reload data to ensure consistency
-              await loadData(); // loadData is called within toggleReadStatus now.
+              // loadData is called within toggleReadStatus now, but not awaited.
             } catch (error) {
               console.error('updateSheetEntry: Erro ao atualizar entrada na planilha:', error);
               showMessage('Erro ao salvar dados na planilha: ' + (error.message || 'Erro desconhecido'), 'error');
@@ -986,3 +987,5 @@
     </script>
 </body>
 </html>
+
+display(HTML(html_code))
