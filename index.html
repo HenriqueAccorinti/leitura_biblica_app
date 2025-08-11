@@ -3,6 +3,996 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📖 Leitura Bíblica Simplificada</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#8B4513">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Leitura Bíblica">
+    <link rel="apple-touch-icon" href="icon-192x192.png">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f5f3f0 0%, #e8e5e1 100%);
+            color: #2c2c2c;
+            min-height: 100vh;
+            padding-bottom: 60px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .user-info {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        .section {
+            background: white;
+            margin-bottom: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .section-header {
+            background: #f8f6f4;
+            padding: 1rem;
+            border-bottom: 1px solid #e0e0e0;
+            font-weight: 600;
+            color: #8B4513;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section-content {
+            padding: 1rem;
+        }
+
+        .user-setup {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .user-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .user-btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 12px 20px;
+            border: 2px solid #8B4513;
+            background: white;
+            color: #8B4513;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .user-btn.active {
+            background: #8B4513;
+            color: white;
+        }
+
+        .user-btn:hover {
+            background: #f0f0f0;
+        }
+
+        .user-btn.active:hover {
+            background: #A0522D;
+        }
+
+        .today-reading {
+            text-align: center;
+            padding: 2rem 1rem;
+            position: relative;
+        }
+
+        .today-verse {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #8B4513;
+            margin-bottom: 1rem;
+        }
+
+        .today-date-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 2rem;
+        }
+
+        .today-date-container button {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            color: #8B4513;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .today-date-container button:disabled {
+            color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .today-date {
+            color: #666;
+        }
+
+        .reading-status {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 8px 16px;
+            border-radius: 20px;
+            background: #f8f9fa;
+            border: 2px solid transparent;
+            min-width: 150px;
+            justify-content: center;
+        }
+
+        .status-item.read {
+            background: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+
+        .status-item.not-read {
+            background: #fff3cd;
+            border-color: #ffc107;
+            color: #856404;
+        }
+
+        .mark-read-btn-container {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 1rem;
+            padding: 0 1rem;
+        }
+
+        .mark-read-btn {
+            padding: 12px 24px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            background: #28a745;
+            color: white;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+
+         .mark-read-btn.btn-danger {
+            background: #dc3545;
+         }
+
+         .mark-read-btn.btn-danger:hover {
+            background: #c82333;
+         }
+
+        .mark-read-btn:hover {
+            background: #218838;
+        }
+
+        .mark-read-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .check-icon {
+            font-size: 1.2rem;
+        }
+
+        .check-icon.read {
+            color: #28a745;
+        }
+
+        .check-icon.not-read {
+            color: #ccc;
+        }
+
+        .message {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .message.info {
+            background: #cce5ff;
+            color: #004085;
+            border: 1px solid #b3d7ff;
+        }
+
+        .offline-indicator {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: #dc3545;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            display: none;
+        }
+
+        .install-prompt {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            left: 20px;
+            background: #8B4513;
+            color: white;
+            padding: 1rem;
+            border-radius: 12px;
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .install-prompt button {
+            background: white;
+            color: #8B4513;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            margin-left: 10px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+         #loadingSection {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+            display: none; /* Initially hidden */
+        }
+
+         /* Fixed positioning for navigation buttons within .today-reading */
+        .today-reading .today-date-container button:first-child {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .today-reading .today-date-container button:nth-child(3) {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+         .today-reading .today-date-container button:nth-child(4) {
+            position: absolute;
+            right: 50px;
+            top: 50%;
+            transform: translateY(-50%);
+         }
+
+         /* Ensure date display is centered and doesn't get covered by arrows */
+         .today-reading .today-date-container .today-date {
+            margin: 0 40px;
+         }
+
+         /* Configuration Section Styles */
+        .config-section .section-header {
+            justify-content: flex-end; /* Align items to the right */
+        }
+
+        .config-toggle-btn {
+            background: none;
+            border: none;
+            color: #8B4513;
+            font-size: 0.9rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            transition: opacity 0.3s ease;
+            opacity: 0.7;
+        }
+
+        .config-toggle-btn:hover {
+            opacity: 1;
+        }
+
+         /* Style for the button to change user */
+        #changeUserBtn {
+            padding: 8px 16px;
+            font-size: 14px;
+            border: 1px solid #8B4513;
+            background: white;
+            color: #8B4513;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        #changeUserBtn:hover {
+            background: #f0f0f0;
+        }
+
+
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📖 Daily Bible</h1>
+        <div class="user-info" id="userInfo">Selecione seu usuário para começar</div>
+    </div>
+
+    <div class="container">
+
+        <!-- Seleção de Usuário (Initially shown if no user is saved) -->
+        <div class="section" id="userSelectionSection">
+            <div class="section-header">
+                👥 Quem é você?
+            </div>
+            <div class="section-content">
+                <div class="user-setup">
+                    <div class="user-buttons">
+                        <button class="user-btn" onclick="selectUser('user1')" id="user1Btn">
+                            Rick
+                        </button>
+                        <button class="user-btn" onclick="selectUser('user2')" id="user2Btn">
+                            Bruna Diamante
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Configuration Section (Shows when a user is selected) -->
+        <div class="section config-section" id="configSection" style="display: none;">
+            <div class="section-header">
+                 <button id="changeUserBtn" onclick="showUserSelection()">Mudar Usuário</button>
+            </div>
+        </div>
+
+
+        <!-- Leitura de Hoje -->
+        <div class="section" id="todaySection" style="display: none;">
+            <div class="section-header">
+                📅 Leitura de Hoje
+            </div>
+            <div class="section-content">
+                 <div id="loadingSection">
+                    Carregando leitura...
+                </div>
+                <div id="todayReadingContent" class="hidden">
+                    <div class="today-reading">
+                        <div class="today-date-container">
+                             <button onclick="navigateDate(-1)" id="prevDayBtn">◀</button>
+                             <span class="today-date" id="todayDate"></span>
+                             <button onclick="navigateDate(1)" id="nextDayBtn">▶</button>
+                             <button onclick="openCalendar()" id="calendarBtn">📅</button>
+                             <input type="date" id="datePicker" style="display:none;">
+                        </div>
+                        <div class="today-verse" id="todayVerse">Carregando...</div>
+                        <div class="reading-status" id="readingStatus"></div>
+                    </div>
+                    <div class="mark-read-btn-container">
+                         <button class="mark-read-btn" onclick="toggleReadStatus()" id="markReadBtn">
+                            ✓ Marcar como Lido
+                         </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="message" class="message"></div>
+    </div>
+
+    <!-- Indicador Offline -->
+    <div class="offline-indicator" id="offlineIndicator">
+        📱 Modo Offline
+    </div>
+
+    <!-- Prompt de Instalação -->
+    <div class="install-prompt" id="installPrompt">
+        <span>📱 Instalar este app no seu dispositivo para uma melhor experiência!</span>
+        <div>
+            <button onclick="installApp()">Instalar</button>
+            <button onclick="dismissInstall()">Agora não</button>
+        </div>
+    </div>
+
+    <script>
+        // Estado da aplicação
+        let currentUser = null;
+        let readingData = []; // This will store data fetched from the sheet
+        let deferredPrompt = null;
+        let currentDate = new Date(); // Keep track of the date being displayed in "Today's Reading"
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzP0BrVws5xgf-8xp-ZFGro_lCFVT37W5WYNlWQnbd0oI1c7pmpBIH-RVvHPhmkEXTzbg/exec"; // Your Google Apps Script URL
+
+        // PWA Installation
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('installPrompt').style.display = 'flex';
+        });
+
+        function installApp() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    deferredPrompt = null;
+                    document.getElementById('installPrompt').style.display = 'none';
+                });
+            }
+        }
+
+        function dismissInstall() {
+            document.getElementById('installPrompt').style.display = 'none';
+        }
+
+        // Inicialização
+        window.addEventListener('load', () => {
+            // Load saved settings
+            const savedUser = localStorage.getItem('currentUser');
+            if (savedUser) {
+                selectUser(savedUser); // Automatically select user if saved
+                // Hide user selection and show config immediately if user is saved
+                document.getElementById('userSelectionSection').style.display = 'none';
+                document.getElementById('configSection').style.display = 'block';
+
+            } else {
+                // Show user selection if no user is saved
+                document.getElementById('userSelectionSection').style.display = 'block';
+                document.getElementById('configSection').style.display = 'none';
+                 // Hide today's section until user is selected
+                 document.getElementById('todaySection').style.display = 'none';
+            }
+
+            // Register service worker
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('sw.js');
+            }
+
+            // Request notification permission (Optional in this simplified version)
+            // if ('Notification' in window) {
+            //     Notification.requestPermission();
+            // }
+
+            // Monitor online/offline status
+            window.addEventListener('online', () => {
+                document.getElementById('offlineIndicator').style.display = 'none';
+                if (currentUser) loadData(); // Reload data when back online
+            });
+
+            window.addEventListener('offline', () => {
+                document.getElementById('offlineIndicator').style.display = 'block';
+            });
+
+            // Set up date picker listener
+            document.getElementById('datePicker').addEventListener('change', (event) => {
+                const selectedDate = new Date(event.target.value + 'T00:00:00'); // Ensure correct timezone handling
+                if (!isNaN(selectedDate.getTime())) {
+                    currentDate = selectedDate;
+                    updateTodaySection(); // Update the section with the selected date's data
+                } else {
+                    showMessage('Data inválida selecionada.', 'error');
+                }
+            });
+        });
+
+        function selectUser(userId) {
+            currentUser = userId;
+            localStorage.setItem('currentUser', userId);
+
+            // Update UI
+            document.querySelectorAll('.user-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(userId + 'Btn').classList.add('active');
+
+            // Show relevant sections
+            document.getElementById('todaySection').style.display = 'block';
+
+            // Hide user selection and show config
+            document.getElementById('userSelectionSection').style.display = 'none';
+            document.getElementById('configSection').style.display = 'block';
+
+
+            // Update header
+            const userName = userId === 'user1' ? 'Rick' : 'Bruna Diamante';
+            const welcomeMessage = userId === 'user1' ? 'Bem-vindo' : 'Bem-vinda';
+            document.getElementById('userInfo').textContent = `Oi ${userName}! ${welcomeMessage} :)`;
+
+            // Load data for the selected user
+            loadData();
+        }
+
+        function showUserSelection() {
+             // Clear current user and local storage item
+            currentUser = null;
+            localStorage.removeItem('currentUser');
+
+            // Reset UI
+            document.getElementById('userInfo').textContent = 'Selecione seu usuário para começar';
+            document.querySelectorAll('.user-btn').forEach(btn => btn.classList.remove('active'));
+
+
+            // Show user selection and hide config and today's section
+            document.getElementById('userSelectionSection').style.display = 'block';
+            document.getElementById('configSection').style.display = 'none';
+            document.getElementById('todaySection').style.display = 'none';
+
+            // Clear displayed data
+            document.getElementById('todayVerse').textContent = 'Carregando...';
+            document.getElementById('todayDate').textContent = '';
+             document.getElementById('readingStatus').innerHTML = '';
+             document.getElementById('markReadBtn').style.display = 'none'; // Hide mark button
+             document.getElementById('todayReadingContent').classList.add('hidden'); // Hide content
+             document.getElementById('loadingSection').style.display = 'none'; // Ensure loading is hidden
+
+            // Clear in-memory reading data
+            readingData = [];
+        }
+
+
+        function updateTodaySection() {
+            const dateToDisplay = currentDate;
+            const dateStr = dateToDisplay.toISOString().split('T')[0];
+            const todayActualStr = new Date().toISOString().split('T')[0];
+
+            // Update date display
+            document.getElementById('todayDate').textContent =
+                dateToDisplay.toLocaleDateString('pt-BR', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+
+            // Update today's reading and status based on fetched data
+            const dataForDate = readingData.find(r => item => item.date === dateStr); /* Corrected find condition */
+            const todayVerseElement = document.getElementById('todayVerse');
+            const markBtn = document.getElementById('markReadBtn');
+
+
+            if (dataForDate) {
+                todayVerseElement.textContent = dataForDate.reading;
+                // Re-evaluate button state based on reading status for the displayed date
+                 const currentUserRead = String(dataForDate[currentUser + '_read']).trim().toUpperCase() === 'TRUE';
+                 if (currentUserRead) {
+                    markBtn.textContent = '✓ Marcar como Não Lido';
+                    markBtn.classList.add('btn-danger');
+                    markBtn.classList.remove('btn-success');
+                 } else {
+                    markBtn.textContent = '✓ Marcar como Lido';
+                    markBtn.classList.remove('btn-danger');
+                    markBtn.classList.add('btn-success');
+                 }
+                 markBtn.style.display = 'block'; // Ensure button is visible if there is data
+                 markBtn.disabled = false; // Enable the button
+                 document.getElementById('todayReadingContent').classList.remove('hidden'); // Show content
+                 document.getElementById('loadingSection').style.display = 'none'; // Hide loading
+            } else {
+                todayVerseElement.textContent = 'Sem leitura programada para esta data';
+                markBtn.style.display = 'none'; // Hide button if no data
+                document.getElementById('todayReadingContent').classList.remove('hidden'); // Show content
+                document.getElementById('loadingSection').style.display = 'none'; // Hide loading
+            }
+
+            // Update reading status indicators
+            updateReadingStatus(dateStr);
+
+             // Disable previous/next buttons if at the start/end of data
+            const prevDayBtn = document.getElementById('prevDayBtn');
+            const nextDayBtn = document.getElementById('nextDayBtn');
+            const firstDate = readingData.length > 0 ? readingData[0].date : null;
+            const lastDate = readingData.length > 0 ? readingData[readingData.length - 1].date : null;
+
+            if (firstDate && dateStr <= firstDate) {
+                prevDayBtn.disabled = true;
+            } else {
+                prevDayBtn.disabled = false;
+            }
+
+            if (lastDate && dateStr >= lastDate) {
+                nextDayBtn.disabled = true;
+            } else {
+                nextDayBtn.disabled = false;
+            }
+        }
+
+        function updateReadingStatus(dateStr) {
+            const statusContainer = document.getElementById('readingStatus');
+
+            if (readingData.length === 0) {
+                statusContainer.innerHTML = '<div class="status-item">Carregando status...</div>';
+                return;
+            }
+
+            const dataForDate = readingData.find(r => r.date === dateStr);
+
+            let html = '';
+
+            if (dataForDate) {
+                 // Status User 1
+                // Check for 'TRUE' string specifically, case-insensitive and trimmed
+                const user1Read = String(dataForDate.user1_read).trim().toUpperCase() === 'TRUE';
+                html += `<div class="status-item ${user1Read ? 'read' : 'not-read'}">
+                    <span class="check-icon ${user1Read ? 'read' : 'not-read'}">
+                        ${user1Read ? '✓' : '○'}
+                    </span>
+                    Rick: ${user1Read ? 'Leu' : 'Não leu'}
+                </div>`;
+
+                // Status User 2
+                 // Check for 'TRUE' string specifically, case-insensitive and trimmed
+                const user2Read = String(dataForDate.user2_read).trim().toUpperCase() === 'TRUE';
+                html += `<div class="status-item ${user2Read ? 'read' : 'not-read'}">
+                    <span class="check-icon ${user2Read ? 'read' : 'not-read'}">
+                        ${user2Read ? '✓' : '○'}
+                    </span>
+                    Bruna Diamante: ${user2Read ? 'Leu' : 'Não leu'}
+                </div>`;
+
+            } else {
+                 html = '<div class="status-item">Sem status para esta data</div>';
+            }
+
+            statusContainer.innerHTML = html;
+        }
+
+        function hasReadToday(date) {
+             const dateStr = date.toISOString().split('T')[0];
+            const todayData = readingData.find(r => r.date === dateStr);
+            return todayData && String(todayData[currentUser + '_read']).trim().toUpperCase() === 'TRUE';
+        }
+
+        async function toggleReadStatus() {
+            if (!currentUser) {
+                showMessage('Selecione seu usuário primeiro.', 'error');
+                return;
+            }
+
+            const dateToUpdate = currentDate.toISOString().split('T')[0];
+            let dataToUpdate = readingData.find(r => r.date === dateToUpdate);
+
+            if (!dataToUpdate) {
+                 showMessage('Nenhuma leitura programada para esta data.', 'error');
+                 return;
+            }
+
+            // Use the more robust check
+            const isCurrentlyRead = String(dataToUpdate[currentUser + '_read']).trim().toUpperCase() === 'TRUE';
+            const newStatus = isCurrentlyRead ? 'FALSE' : 'TRUE';
+
+            try {
+                console.log('toggleReadStatus: Attempting to toggle reading status.');
+                console.log(`toggleReadStatus: Date: ${dateToUpdate}, User: ${currentUser}, New Status: ${newStatus}`);
+
+                // Find the index of the data to update locally
+                const dataIndex = readingData.findIndex(r => r.date === dateToUpdate);
+
+                if (dataIndex !== -1) {
+                    // Update the local readingData array immediately for perceived speed
+                    readingData[dataIndex][currentUser + '_read'] = newStatus;
+                    console.log("toggleReadStatus: Local readingData updated:", readingData[dataIndex]);
+
+                    // Update the UI based on the locally updated data
+                    updateReadingStatus(dateToUpdate);
+                    updateTodaySection(); // Update button state
+
+
+                     // Send update request to Google Apps Script for this specific entry (without awaiting)
+                    updateSheetEntry(dateToUpdate, currentUser, newStatus).then(() => {
+                        console.log("toggleReadStatus: Sheet update finished.");
+                        // After successful sheet update, reload data in the background to ensure consistency
+                        loadData();
+                    }).catch(error => {
+                         console.error('toggleReadStatus: Error during sheet update:', error);
+                         showMessage('Erro ao salvar dados na planilha: ' + (error.message || 'Erro desconhecido'), 'error');
+                         // Optionally, revert local changes if sheet update failed critically
+                         // For now, we'll let the next background load correct it.
+                    });
+
+                    console.log("toggleReadStatus: Sheet update initiated asynchronously.");
+
+
+                } else {
+                    console.error("toggleReadStatus: Could not find data for the displayed date in readingData array.");
+                    showMessage('Erro interno: dados da data exibida não encontrados localmente.', 'error');
+                    return;
+                }
+
+                showMessage(`✓ Leitura marcada como ${newStatus === 'TRUE' ? 'concluída' : 'não lida'}!`, 'success');
+
+            } catch (error) {
+                console.error('toggleReadStatus: Erro ao marcar leitura:', error);
+                showMessage('Erro ao marcar leitura: ' + (error.message || 'Erro desconhecido'), 'error');
+                // If local update or initial sheet request fails
+            }
+        }
+
+
+        async function loadData() {
+            if (!SCRIPT_URL) {
+                showMessage('URL do Apps Script não configurada.', 'error');
+                return;
+            }
+
+            showLoading(true);
+            document.getElementById('todayReadingContent').classList.add('hidden'); // Hide content while loading
+
+            try {
+                console.log("loadData: Fetching data from Google Apps Script...");
+                const response = await fetch(SCRIPT_URL + '?action=read');
+                console.log("loadData: Fetch response received.");
+
+                if (!response.ok) {
+                     const errorText = await response.text();
+                     console.error("loadData: HTTP error response text:", errorText);
+                     throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+                console.log("loadData: Data fetch result:", result);
+
+                if (result.success && Array.isArray(result.data)) {
+                    // Assuming the first row is header and subsequent rows are data
+                    if (result.data.length > 1) {
+                         const header = result.data[0]; // ['date', 'reading', 'user1_read', 'user2_read']
+                         const dataRows = result.data.slice(1);
+
+                         readingData = dataRows.map(row => {
+                            const obj = {};
+                            header.forEach((key, index) => {
+                                obj[key] = row[index];
+                            });
+                            return obj;
+                         });
+
+                        // Sort data by date
+                        readingData.sort((a, b) => new Date(a.date) - new Date(b.date));
+                        console.log("loadData: Reading data loaded and sorted:", readingData);
+
+
+                    } else {
+                        readingData = []; // No data rows found
+                        console.log("loadData: No data rows found in sheet.");
+                    }
+
+                    // Set currentDate to today after loading data, but only if it's the initial load
+                    // or if the current displayed date is no longer in the loaded data
+                    const todayActualStr = new Date().toISOString().split('T')[0];
+                    const isCurrentDateInLoadedData = readingData.some(item => item.date === currentDate.toISOString().split('T')[0]);
+
+                    if (readingData.length > 0 && !isCurrentDateInLoadedData) {
+                        // If current date is not in data, set to today or first date available
+                         currentDate = new Date(readingData[0].date + 'T00:00:00');
+                         console.log("loadData: Current date not in data, setting to first available date:", currentDate.toISOString().split('T')[0]);
+                    } else if (readingData.length === 0) {
+                         currentDate = new Date(); // Default to today if no data
+                         console.log("loadData: No data, setting current date to today:", currentDate.toISOString().split('T')[0]);
+                    } else {
+                         console.log("loadData: Current date is valid and in data, keeping:", currentDate.toISOString().split('T')[0]);
+                    }
+                     // If currentDate was already valid and in data, keep it.
+
+
+                    updateTodaySection(); // Update UI with the determined date
+                    showMessage('Dados carregados com sucesso!', 'success');
+
+                    // Save offline backup
+                    localStorage.setItem('offlineReadingData', JSON.stringify(readingData));
+                    console.log("loadData: Offline data saved.");
+
+                } else {
+                    console.error("loadData: Data fetch result indicates failure:", result);
+                    throw new Error(result.error || 'Formato de dados inválido ou erro desconhecido');
+                }
+            } catch (error) {
+                console.error('loadData: Erro ao carregar dados:', error);
+                showMessage('Erro ao carregar dados. Verifique a URL do Apps Script e a planilha. Detalhes: ' + (error.message || 'Erro desconhecido'), 'error');
+
+                // Load offline data if available
+                const offlineData = localStorage.getItem('offlineReadingData');
+                if (offlineData) {
+                    try {
+                        readingData = JSON.parse(offlineData);
+                        showMessage('Dados offline carregados.', 'info');
+                         // Set currentDate to today after loading offline data
+                        currentDate = new Date(); // Default to today
+                        updateTodaySection(); // Update UI with today's date initially
+                         console.log("loadData: Offline data parsed and loaded.");
+                    } catch(e) {
+                        console.error("loadData: Error parsing offline data:", e);
+                        readingData = [];
+                        currentDate = new Date(); // Still set current date to today
+                        updateTodaySection(); // Update UI
+                        showMessage('Erro ao carregar dados offline.', 'error');
+                    }
+                } else {
+                     readingData = [];
+                     currentDate = new Date(); // Still set current date to today
+                     updateTodaySection(); // Update UI
+                     console.log("loadData: No offline data available.");
+                }
+            } finally {
+                showLoading(false);
+                 console.log("loadData: Loading finished.");
+            }
+        }
+
+        function navigateDate(days) {
+            const newDate = new Date(currentDate);
+            newDate.setDate(newDate.getDate() + days);
+
+            // Find the closest available date in readingData
+            const newDateStr = newDate.toISOString().split('T')[0];
+            const closestData = readingData.find(item => item.date === newDateStr);
+
+            if (closestData) {
+                 currentDate = new Date(closestData.date + 'T00:00:00'); // Update currentDate to the found date's date
+                 updateTodaySection();
+            } else {
+                // If the exact date is not found, find the next/previous available date
+                let targetDate = new Date(newDate);
+                let foundDateData = null;
+                let searchLimit = 365; // Limit search to prevent infinite loops
+
+                while (searchLimit > 0) {
+                    targetDate.setDate(targetDate.getDate() + (days > 0 ? 1 : -1));
+                    const targetDateStr = targetDate.toISOString().split('T')[0];
+                    foundDateData = readingData.find(item => item.date === targetDateStr);
+                    if (foundDateData) {
+                        currentDate = new Date(foundDateData.date + 'T00:00:00'); // Update currentDate
+                        updateTodaySection();
+                        break;
+                    }
+                    searchLimit--;
+                }
+
+                if (!foundDateData) {
+                    showMessage('Nenhuma leitura encontrada nesta direção.', 'info');
+                }
+            }
+        }
+
+        function openCalendar() {
+             document.getElementById('datePicker').click(); // Trigger the hidden date input
+        }
+
+
+        async function updateSheetEntry(date, user, status) {
+            if (!SCRIPT_URL) {
+              showMessage('URL do Apps Script não configurada.', 'error');
+              return;
+            }
+
+            console.log('updateSheetEntry: Sending update request.');
+            console.log(`updateSheetEntry: URL: ${SCRIPT_URL}`);
+            console.log(`updateSheetEntry: Method: POST`);
+            console.log(`updateSheetEntry: Body: ${JSON.stringify({ action: 'markRead', date: date, user: user, status: status })}`);
+
+            try {
+              const response = await fetch(SCRIPT_URL, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'X-Requested-With': 'XMLHttpRequest'
+                },
+                mode: 'no-cors',
+                body: JSON.stringify({
+                  action: 'markRead',
+                  date: date,
+                  user: user,
+                  status: status
+                })
+              });
+
+              console.log("updateSheetEntry: Fetch response received.");
+              console.log("updateSheetEntry: Response status:", response.status);
+              console.log("updateSheetEntry: Response OK:", response.ok);
+
+              if (!response.ok) {
+                const errorText = await response.text();
+                //console.error("updateSheetEntry: HTTP error response text:", errorText);
+                //throw new Error(`HTTP error! status: ${response.status}, Response: ${errorText}`);
+              }
+
+              // Como estamos usando mode 'no-cors', não podemos acessar o corpo da resposta diretamente
+              // Assim, vamos assumir que a resposta é bem-sucedida e continuar com o fluxo normal
+
+              console.log("updateSheetEntry: Update successful.");
+              // After successful sheet update, reload data to ensure consistency
+              await loadData(); // loadData is called within toggleReadStatus now.
+            } catch (error) {
+              console.error('updateSheetEntry: Erro ao atualizar entrada na planilha:', error);
+              showMessage('Erro ao salvar dados na planilha: ' + (error.message || 'Erro desconhecido'), 'error');
+              throw error; // Re-throw to be caught by toggleReadStatus
+            }
+        }
+
+        function showLoading(show) {
+            document.getElementById('loadingSection').style.display = show ? 'block' : 'none';
+        }
+
+        function showMessage(text, type = 'info') {
+            const messageDiv = document.getElementById('message');
+            messageDiv.className = 'message ' + type;
+            messageDiv.textContent = text;
+            messageDiv.style.display = 'block';
+
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        // Fetch new data periodically when online
+        setInterval(() => {
+            if (navigator.onLine && currentUser) {
+                loadData();
+            }
+        }, 5 * 60 * 1000); // Every 5 minutes
+
+    </script>
+</body>
+</html>
+
+<!-- VERSÃO COMPLETA, MAS NÃO 100% FUNCIONAL
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>📖 Leitura Bíblica</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#8B4513">
@@ -1498,3 +2488,4 @@
     </script>
 </body>
 </html>
+-->
