@@ -332,22 +332,33 @@
 
          /* Configuration Section Styles */
         .config-section .section-header {
-            justify-content: flex-end; /* Align items to the right */
+            justify-content: space-between;
         }
 
-        .config-toggle-btn {
-            background: none;
+        .nav-tabs {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .nav-tab {
+            padding: 8px 16px;
             border: none;
+            background: #f8f6f4;
             color: #8B4513;
-            font-size: 0.9rem;
+            border-radius: 6px;
             cursor: pointer;
-            padding: 0.5rem;
-            transition: opacity 0.3s ease;
-            opacity: 0.7;
+            font-weight: 500;
+            transition: all 0.3s;
         }
 
-        .config-toggle-btn:hover {
-            opacity: 1;
+        .nav-tab.active {
+            background: #8B4513;
+            color: white;
+        }
+
+        .nav-tab:hover {
+            background: #A0522D;
+            color: white;
         }
 
          /* Style for the button to change user */
@@ -367,7 +378,149 @@
             background: #f0f0f0;
         }
 
+        /* Table Styles */
+        .reading-table {
+            overflow-x: auto;
+        }
 
+        .reading-table table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .reading-table th,
+        .reading-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .reading-table th {
+            background: #f8f6f4;
+            font-weight: 600;
+            color: #8B4513;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .reading-table .date-col {
+            width: 120px;
+            min-width: 120px;
+        }
+
+        .reading-table .status-col {
+            width: 80px;
+            text-align: center;
+        }
+
+        .reading-table .reading-col {
+            min-width: 200px;
+        }
+
+        .reading-table .today-row {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+        }
+
+        .reading-table .today-row td {
+            font-weight: 600;
+        }
+
+        /* Book Group Styles */
+        .book-group {
+            margin-bottom: 1rem;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .book-header {
+            background: #8B4513;
+            color: white;
+            padding: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-weight: 600;
+        }
+
+        .book-header:hover {
+            background: #A0522D;
+        }
+
+        .book-header.collapsed {
+            background: #f8f6f4;
+            color: #8B4513;
+        }
+
+        .toggle-icon {
+            transition: transform 0.3s;
+            font-size: 0.8rem;
+        }
+
+        .book-content {
+            display: none;
+            background: white;
+        }
+
+        .book-content.expanded {
+            display: block;
+        }
+
+        .book-content table {
+            margin-top: 0;
+        }
+
+        /* Button Styles */
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .section-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: stretch;
+            }
+
+            .nav-tabs {
+                justify-content: center;
+            }
+
+            .reading-table .date-col,
+            .reading-table .status-col {
+                width: auto;
+                min-width: auto;
+            }
+
+            .reading-table th,
+            .reading-table td {
+                padding: 8px 4px;
+                font-size: 0.9rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -400,10 +553,17 @@
         <!-- Configuration Section (Shows when a user is selected) -->
         <div class="section config-section" id="configSection" style="display: none;">
             <div class="section-header">
-                 <button id="changeUserBtn" onclick="showUserSelection()">Mudar Usuário</button>
+                <div class="nav-tabs">
+                    <button class="nav-tab active" onclick="showTab('today')" id="todayTab">
+                        📅 Hoje
+                    </button>
+                    <button class="nav-tab" onclick="showTab('schedule')" id="scheduleTab">
+                        📋 Cronograma
+                    </button>
+                </div>
+                <button id="changeUserBtn" onclick="showUserSelection()">Mudar Usuário</button>
             </div>
         </div>
-
 
         <!-- Leitura de Hoje -->
         <div class="section" id="todaySection" style="display: none;">
@@ -435,6 +595,25 @@
             </div>
         </div>
 
+        <!-- Tabela de Leituras -->
+        <div class="section" id="tableSection" style="display: none;">
+            <div class="section-header">
+                📋 Cronograma
+                <div style="margin-left: auto; display: flex; gap: 10px;">
+                    <button class="btn btn-secondary" onclick="loadData()">🔄 Atualizar</button>
+                     <button class="btn btn-secondary" id="toggleViewBtn" onclick="toggleTableView()">Cronograma Completo</button>
+                </div>
+            </div>
+            <div class="section-content">
+                <div class="reading-table">
+                    <div id="loadingTable" class="hidden" style="text-align: center; padding: 2rem; color: #666;">
+                        Carregando cronograma...
+                    </div>
+                    <div id="tableContainer"></div>
+                </div>
+            </div>
+        </div>
+
         <div id="message" class="message"></div>
     </div>
 
@@ -458,6 +637,7 @@
         let readingData = []; // This will store data fetched from the sheet
         let deferredPrompt = null;
         let currentDate = new Date(); // Keep track of the date being displayed in "Today's Reading"
+        let fullView = false; // Track table view mode
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzP0BrVws5xgf-8xp-ZFGro_lCFVT37W5WYNlWQnbd0oI1c7pmpBIH-RVvHPhmkEXTzbg/exec"; // Your Google Apps Script URL
 
         // PWA Installation
@@ -611,6 +791,24 @@
             }, 10 * 60 * 1000);
         }
 
+        // Tab Navigation
+        function showTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+            
+            if (tabName === 'today') {
+                document.getElementById('todayTab').classList.add('active');
+                document.getElementById('todaySection').style.display = 'block';
+                document.getElementById('tableSection').style.display = 'none';
+            } else if (tabName === 'schedule') {
+                document.getElementById('scheduleTab').classList.add('active');
+                document.getElementById('todaySection').style.display = 'none';
+                document.getElementById('tableSection').style.display = 'block';
+                // Render table when showing schedule tab
+                renderTable(fullView);
+            }
+        }
+
         function selectUser(userId) {
             currentUser = userId;
             localStorage.setItem('currentUser', userId);
@@ -620,12 +818,11 @@
             document.getElementById(userId + 'Btn').classList.add('active');
 
             // Show relevant sections
-            document.getElementById('todaySection').style.display = 'block';
+            showTab('today'); // Default to today tab
 
             // Hide user selection and show config
             document.getElementById('userSelectionSection').style.display = 'none';
             document.getElementById('configSection').style.display = 'block';
-
 
             // Update header
             const userName = userId === 'user1' ? 'Rick' : 'Bruna Diamante';
@@ -645,11 +842,11 @@
             document.getElementById('userInfo').textContent = 'Selecione seu usuário para começar';
             document.querySelectorAll('.user-btn').forEach(btn => btn.classList.remove('active'));
 
-
-            // Show user selection and hide config and today's section
+            // Show user selection and hide config and sections
             document.getElementById('userSelectionSection').style.display = 'block';
             document.getElementById('configSection').style.display = 'none';
             document.getElementById('todaySection').style.display = 'none';
+            document.getElementById('tableSection').style.display = 'none';
 
             // Clear displayed data
             document.getElementById('todayVerse').textContent = 'Carregando...';
@@ -662,7 +859,6 @@
             // Clear in-memory reading data
             readingData = [];
         }
-
 
         function updateTodaySection() {
             const dateToDisplay = currentDate;
@@ -682,7 +878,6 @@
             const dataForDate = readingData.find(r => r.date === dateStr);
             const todayVerseElement = document.getElementById('todayVerse');
             const markBtn = document.getElementById('markReadBtn');
-
 
             if (dataForDate) {
                 todayVerseElement.textContent = dataForDate.reading;
@@ -810,7 +1005,6 @@
                     updateReadingStatus(dateToUpdate);
                     updateTodaySection(); // Update button state based on the new local data
 
-
                      // Send update request to Google Apps Script for this specific entry (without awaiting)
                     updateSheetEntry(dateToUpdate, currentUser, newStatus).then(() => {
                         console.log("toggleReadStatus: Sheet update finished.");
@@ -826,7 +1020,6 @@
 
                     console.log("toggleReadStatus: Sheet update initiated asynchronously.");
 
-
                 } else {
                     console.error("toggleReadStatus: Could not find data for the displayed date in readingData array.");
                     showMessage('Erro interno: dados da data exibida não encontrados localmente.', 'error');
@@ -841,7 +1034,6 @@
                 // If local update or initial sheet request fails
             }
         }
-
 
         async function loadData() {
             if (!SCRIPT_URL) {
@@ -884,7 +1076,6 @@
                         readingData.sort((a, b) => new Date(a.date) - new Date(b.date));
                         console.log("loadData: Reading data loaded and sorted:", readingData);
 
-
                     } else {
                         readingData = []; // No data rows found
                         console.log("loadData: No data rows found in sheet.");
@@ -907,8 +1098,13 @@
                     }
                      // If currentDate was already valid and in data, keep it.
 
-
                     updateTodaySection(); // Update UI with the determined date
+                    
+                    // Update table if it's currently visible
+                    if (document.getElementById('tableSection').style.display !== 'none') {
+                        renderTable(fullView);
+                    }
+                    
                     showMessage('Dados carregados com sucesso!', 'success');
 
                     // Save offline backup
@@ -991,7 +1187,6 @@
              document.getElementById('datePicker').click(); // Trigger the hidden date input
         }
 
-
         async function updateSheetEntry(date, user, status) {
             if (!SCRIPT_URL) {
               showMessage('URL do Apps Script não configurada.', 'error');
@@ -1042,8 +1237,187 @@
             }
         }
 
+        // Table rendering functions
+        function renderTable(showFull) {
+            const container = document.getElementById('tableContainer');
+            const today = new Date().toISOString().split('T')[0];
+            const toggleBtn = document.getElementById('toggleViewBtn');
+
+            console.log("renderTable: Rendering table. showFull:", showFull);
+            console.log("renderTable: Data to render:", readingData);
+
+            if (readingData.length === 0) {
+                container.innerHTML = '<div style="text-align: center; padding: 2rem; color: #666;">Nenhum dado encontrado na planilha.</div>';
+                toggleBtn.style.display = 'none';
+                console.log("renderTable: No reading data, showing empty message.");
+                return;
+            }
+
+            let dataToDisplay = readingData;
+
+            if (!showFull) {
+                const todayIndex = readingData.findIndex(item => item.date === today);
+                if (todayIndex !== -1) {
+                    const startIndex = Math.max(0, todayIndex - 3);
+                    const endIndex = Math.min(readingData.length - 1, todayIndex + 6);
+                    dataToDisplay = readingData.slice(startIndex, endIndex + 1);
+                     console.log("renderTable: Showing daily summary view.");
+                } else {
+                    // If today's reading isn't found, just show the first 10 entries or all if less than 10
+                     dataToDisplay = readingData.slice(0, Math.min(readingData.length, 10));
+                     console.log("renderTable: Today's reading not found, showing first few entries.");
+                }
+                 toggleBtn.textContent = 'Cronograma Completo'; // Keep this here for initial render
+                 toggleBtn.style.display = 'block'; // Show button to toggle
+            } else {
+                 toggleBtn.textContent = 'Resumo Diário'; // Keep this here for initial render
+                 toggleBtn.style.display = 'block'; // Show button to toggle
+                 console.log("renderTable: Showing full schedule view.");
+            }
+
+            if (showFull) {
+                // Group data by book for full view
+                const groupedData = dataToDisplay.reduce((acc, item) => {
+                    // Extract book name (assuming format "Book Chapter")
+                    const parts = item.reading.split(' ');
+                    const book = parts.slice(0, -1).join(' '); // Take all parts except the last one as book name
+                    if (!acc[book]) {
+                        acc[book] = [];
+                    }
+                    acc[book].push(item);
+                    return acc;
+                }, {});
+
+                let html = '';
+                for (const book in groupedData) {
+                    html += `
+                        <div class="book-group">
+                            <div class="book-header" onclick="toggleBook(this)">
+                                ${book} <span class="toggle-icon">▶</span>
+                            </div>
+                            <div class="book-content">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th class="date-col">Data</th>
+                                            <th class="reading-col">Leitura</th>
+                                            <th class="status-col">Rick</th>
+                                            <th class="status-col">Bruna Diamante</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                    `;
+                    groupedData[book].forEach(item => {
+                        const isToday = item.date === today;
+                        // Use the more robust check for table rendering too
+                        const user1Read = String(item.user1_read).trim().toUpperCase() === 'TRUE';
+                        const user2Read = String(item.user2_read).trim().toUpperCase() === 'TRUE';
+                        html += `
+                            <tr ${isToday ? 'class="today-row"' : ''}>
+                                <td class="date-col">
+                                    ${new Date(item.date + 'T00:00:00').toLocaleDateString('pt-BR')}
+                                    ${isToday ? '<br><small>HOJE</small>' : ''}
+                                </td>
+                                <td class="reading-col">${item.reading}</td>
+                                <td class="status-col">
+                                    <span class="check-icon ${user1Read ? 'read' : 'not-read'}">
+                                        ${user1Read ? '✓' : '○'}
+                                    </span>
+                                </td>
+                                <td class="status-col">
+                                    <span class="check-icon ${user2Read ? 'read' : 'not-read'}">
+                                        ${user2Read ? '✓' : '○'}
+                                    </span>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                    html += `
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    `;
+                }
+                container.innerHTML = html;
+                 console.log("renderTable: Full table HTML generated.");
+
+            } else {
+                 // Render the limited table view
+                let html = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="date-col">Data</th>
+                                <th class="reading-col">Leitura</th>
+                                <th class="status-col">Rick</th>
+                                <th class="status-col">Bruna Diamante</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+
+                dataToDisplay.forEach(item => {
+                    const isToday = item.date === today;
+                    // Use the more robust check for table rendering too
+                    const user1Read = String(item.user1_read).trim().toUpperCase() === 'TRUE';
+                    const user2Read = String(item.user2_read).trim().toUpperCase() === 'TRUE';
+
+                    html += `
+                        <tr ${isToday ? 'class="today-row"' : ''}>
+                            <td class="date-col">
+                                ${new Date(item.date + 'T00:00:00').toLocaleDateString('pt-BR')}
+                                ${isToday ? '<br><small>HOJE</small>' : ''}
+                            </td>
+                            <td class="reading-col">${item.reading}</td>
+                            <td class="status-col">
+                                <span class="check-icon ${user1Read ? 'read' : 'not-read'}">
+                                    ${user1Read ? '✓' : '○'}
+                                </span>
+                            </td>
+                            <td class="status-col">
+                                <span class="check-icon ${user2Read ? 'read' : 'not-read'}">
+                                    ${user2Read ? '✓' : '○'}
+                                </span>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                html += '</tbody></table>';
+                container.innerHTML = html;
+                 console.log("renderTable: Summary table HTML generated.");
+            }
+        }
+
+        function toggleTableView() {
+            fullView = !fullView;
+            const toggleBtn = document.getElementById('toggleViewBtn');
+            if (fullView) {
+                toggleBtn.textContent = 'Resumo Diário';
+            } else {
+                toggleBtn.textContent = 'Cronograma Completo';
+            }
+            renderTable(fullView);
+        }
+
+        function toggleBook(headerElement) {
+            const contentElement = headerElement.nextElementSibling;
+            const toggleIcon = headerElement.querySelector('.toggle-icon');
+            if (contentElement.classList.contains('expanded')) {
+                contentElement.classList.remove('expanded');
+                headerElement.classList.add('collapsed');
+                toggleIcon.style.transform = 'rotate(0deg)';
+            } else {
+                contentElement.classList.add('expanded');
+                 headerElement.classList.remove('collapsed');
+                 toggleIcon.style.transform = 'rotate(90deg)';
+            }
+        }
+
         function showLoading(show) {
             document.getElementById('loadingSection').style.display = show ? 'block' : 'none';
+            document.getElementById('loadingTable').style.display = show ? 'block' : 'none';
         }
 
         function showMessage(text, type = 'info') {
