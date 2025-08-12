@@ -1,4 +1,4 @@
-const CACHE_NAME = 'planilha-pwa-v1.0.3'; // IMPORTANTE: Incremente esta versão a cada atualização
+const CACHE_NAME = 'planilha-pwa-v1.0.4'; // IMPORTANTE: Incremente esta versão a cada atualização
 const urlsToCache = [
   './',
   './index.html',
