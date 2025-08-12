@@ -148,7 +148,7 @@
 
         .today-date {
             color: #666;
-            font-size: 0.8rem; /* Decreased font size */
+            font-size: 0.9rem; /* Decreased font size */
         }
 
         .reading-status {
@@ -156,6 +156,7 @@
             gap: 1rem;
             justify-content: center;
             flex-wrap: wrap;
+            margin-top: 1rem; /* Added margin top for spacing */
         }
 
         .status-item {
@@ -165,70 +166,78 @@
             padding: 8px 16px;
             border-radius: 20px;
             background: #f8f9fa;
-            border: 2px solid transparent;
+            border: 1px solid #e0e0e0; /* Subtle border */
+            color: #2c2c2c; /* Default text color */
             min-width: 150px;
             justify-content: center;
         }
 
-        .status-item.read {
-            background: #d4edda;
-            border-color: #28a745;
-            color: #155724;
+        .status-item .check-icon.read {
+            color: #28a745; /* Keep green for read icon */
         }
 
-        .status-item.not-read {
-            background: #fff3cd;
-            border-color: #ffc107;
-            color: #856404;
-        }
+         .status-item .check-icon.not-read {
+            color: #e0e0e0; /* Grey for not read icon */
+         }
 
         .mark-read-btn-container {
             display: flex;
-            justify-content: flex-end;
-            margin-top: 1rem;
+            justify-content: center; /* Centered the button */
+            margin-top: 1.5rem; /* Increased margin top */
             padding: 0 1rem;
         }
 
         .mark-read-btn {
             padding: 12px 24px;
-            font-size: 16px;
-            border: none;
+            font-size: 1rem; /* Adjusted font size */
+            border: 1px solid #8B4513; /* Added border */
             border-radius: 8px;
-            background: #28a745;
-            color: white;
+            background: white; /* Default background */
+            color: #8B4513; /* Default text color */
             cursor: pointer;
             font-weight: 500;
-            transition: background 0.3s;
+            transition: all 0.3s;
         }
 
          .mark-read-btn.btn-danger {
             background: #dc3545;
+            color: white; /* White text for danger */
+            border-color: #dc3545;
          }
 
          .mark-read-btn.btn-danger:hover {
             background: #c82333;
+            border-color: #c82333;
          }
 
-        .mark-read-btn:hover {
-            background: #218838;
+        .mark-read-btn.btn-success {
+             background: #28a745;
+             color: white; /* White text for success */
+             border-color: #28a745;
         }
+
+        .mark-read-btn.btn-success:hover {
+             background: #218838;
+             border-color: #218838;
+        }
+
+
+        .mark-read-btn:hover:not(:disabled):not(.btn-danger):not(.btn-success) {
+             background: #f0f0f0; /* Hover for default state */
+        }
+
 
         .mark-read-btn:disabled {
             background: #ccc;
             cursor: not-allowed;
+            border-color: #ccc;
+            color: #666;
         }
 
         .check-icon {
             font-size: 1.2rem;
         }
 
-        .check-icon.read {
-            color: #28a745;
-        }
-
-        .check-icon.not-read {
-            color: #ccc;
-        }
 
         .message {
             padding: 1rem;
@@ -576,7 +585,6 @@
                              <button onclick="navigateDate(-1)" id="prevDayBtn">◀</button>
                              <span class="today-date" id="todayDate"></span>
                              <button onclick="navigateDate(1)" id="nextDayBtn">▶</button>
-                             <!-- Removed calendar button -->
                         </div>
                         <div class="today-verse" id="todayVerse">Carregando...</div>
                         <div class="reading-status" id="readingStatus"></div>
@@ -688,8 +696,6 @@
             window.addEventListener('offline', () => {
                 document.getElementById('offlineIndicator').style.display = 'block';
             });
-
-            // Removed date picker listener
         });
 
         // Service Worker com Auto-Update
@@ -1070,13 +1076,20 @@
 
                     // Set currentDate to today after loading data, but only if it's the initial load
                     // or if the current displayed date is no longer in the loaded data
-                    const todayActualStr = new Date().toLocaleDateString('en-CA'); // Use local date string
+                    const todayActualDate = new Date();
+                    const todayActualStr = todayActualDate.toLocaleDateString('en-CA'); // Use local date string for comparison
                     const isCurrentDateInLoadedData = readingData.some(item => item.date === currentDate.toLocaleDateString('en-CA')); // Use local date string
 
                     if (readingData.length > 0 && !isCurrentDateInLoadedData) {
                         // If current date is not in data, set to today or first date available
-                         currentDate = new Date(readingData[0].date + 'T00:00:00'); // Dates from sheet are already YYYY-MM-DD
-                         console.log("loadData: Current date not in data, setting to first available date:", currentDate.toLocaleDateString('en-CA'));
+                         const todayDataExists = readingData.some(item => item.date === todayActualStr);
+                         if (todayDataExists) {
+                            currentDate = todayActualDate; // Set to today if data exists for today
+                            console.log("loadData: Current date not in data, setting to today:", currentDate.toLocaleDateString('en-CA'));
+                         } else {
+                            currentDate = new Date(readingData[0].date + 'T00:00:00'); // Set to first available date
+                             console.log("loadData: Current date not in data and no data for today, setting to first available date:", currentDate.toLocaleDateString('en-CA'));
+                         }
                     } else if (readingData.length === 0) {
                          currentDate = new Date(); // Default to today if no data
                          console.log("loadData: No data, setting current date to today:", currentDate.toLocaleDateString('en-CA'));
@@ -1084,6 +1097,7 @@
                          console.log("loadData: Current date is valid and in data, keeping:", currentDate.toLocaleDateString('en-CA'));
                     }
                      // If currentDate was already valid and in data, keep it.
+
 
                     updateTodaySection(); // Update UI with the determined date
 
@@ -1170,7 +1184,6 @@
             }
         }
 
-        // Removed openCalendar function
 
         async function updateSheetEntry(date, user, status) {
             if (!SCRIPT_URL) {
