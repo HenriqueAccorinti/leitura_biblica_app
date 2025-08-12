@@ -499,15 +499,10 @@
                  document.getElementById('todaySection').style.display = 'none';
             }
 
-            // Register service worker
+            // Register service worker com sistema de auto-update
             if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('sw.js');
+                registerServiceWorker();
             }
-
-            // Request notification permission (Optional in this simplified version)
-            // if ('Notification' in window) {
-            //     Notification.requestPermission();
-            // }
 
             // Monitor online/offline status
             window.addEventListener('online', () => {
@@ -530,6 +525,91 @@
                 }
             });
         });
+
+        // Service Worker com Auto-Update
+        async function registerServiceWorker() {
+            try {
+                const registration = await navigator.serviceWorker.register('sw.js');
+                console.log('Service Worker registrado:', registration);
+
+                // Verifica por atualizações a cada 30 segundos
+                setInterval(() => {
+                    registration.update();
+                }, 30000);
+
+                // Escuta por atualizações do service worker
+                registration.addEventListener('updatefound', () => {
+                    const newWorker = registration.installing;
+                    console.log('Nova versão do app encontrada!');
+                    
+                    newWorker.addEventListener('statechange', () => {
+                        if (newWorker.state === 'installed') {
+                            if (navigator.serviceWorker.controller) {
+                                // Nova versão disponível
+                                showUpdatePrompt(newWorker);
+                            } else {
+                                // Primeira instalação
+                                console.log('App instalado pela primeira vez');
+                            }
+                        }
+                    });
+                });
+
+                // Escuta por controle do service worker
+                navigator.serviceWorker.addEventListener('controllerchange', () => {
+                    console.log('Service Worker atualizado, recarregando página...');
+                    window.location.reload();
+                });
+
+            } catch (error) {
+                console.log('Erro ao registrar Service Worker:', error);
+            }
+        }
+
+        function showUpdatePrompt(worker) {
+            // Remove prompt anterior se existir
+            const existingPrompt = document.querySelector('.update-prompt');
+            if (existingPrompt) {
+                existingPrompt.remove();
+            }
+
+            // Cria um prompt de atualização
+            const updatePrompt = document.createElement('div');
+            updatePrompt.className = 'install-prompt update-prompt';
+            updatePrompt.style.display = 'flex';
+            updatePrompt.innerHTML = `
+                <span>🔄 Nova versão disponível! Atualizar agora?</span>
+                <div>
+                    <button onclick="updateApp()" style="background: white; color: #8B4513; border: none; padding: 8px 16px; border-radius: 6px; margin-left: 10px; cursor: pointer; font-weight: 500;">Atualizar</button>
+                    <button onclick="dismissUpdate()" style="background: transparent; color: white; border: 1px solid white; padding: 8px 16px; border-radius: 6px; margin-left: 10px; cursor: pointer; font-weight: 500;">Mais tarde</button>
+                </div>
+            `;
+            document.body.appendChild(updatePrompt);
+
+            // Guarda referência do worker para usar na atualização
+            window.waitingWorker = worker;
+        }
+
+        function updateApp() {
+            if (window.waitingWorker) {
+                window.waitingWorker.postMessage({ type: 'SKIP_WAITING' });
+                // O evento 'controllerchange' vai recarregar a página
+                const updatePrompt = document.querySelector('.update-prompt');
+                if (updatePrompt) updatePrompt.style.display = 'none';
+                showMessage('Atualizando aplicativo...', 'info');
+            }
+        }
+
+        function dismissUpdate() {
+            const updatePrompt = document.querySelector('.update-prompt');
+            if (updatePrompt) updatePrompt.style.display = 'none';
+            // Pergunta novamente em 10 minutos
+            setTimeout(() => {
+                if (window.waitingWorker) {
+                    showUpdatePrompt(window.waitingWorker);
+                }
+            }, 10 * 60 * 1000);
+        }
 
         function selectUser(userId) {
             currentUser = userId;
