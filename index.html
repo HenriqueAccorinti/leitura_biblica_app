@@ -386,6 +386,7 @@
         /* Table Styles */
         .reading-table {
             overflow-x: auto;
+            padding: 0 1rem; /* Added horizontal padding */
         }
 
         .reading-table table {
@@ -411,17 +412,28 @@
         }
 
         .reading-table .date-col {
-            width: 100px; /* Adjusted width */
-            min-width: 100px; /* Adjusted min-width */
+            width: 80px; /* Adjusted width */
+            min-width: 80px; /* Adjusted min-width */
         }
 
         .reading-table .status-col {
-            width: 80px;
+            width: 60px; /* Adjusted width */
+            min-width: 60px; /* Adjusted min-width */
             text-align: center;
+             /* Added padding to status columns */
+        }
+        .reading-table th:last-child,
+        .reading-table td:last-child {
+            padding-right: 12px; /* Ensure right padding */
         }
 
+
         .reading-table .reading-col {
-            min-width: 200px;
+             /* Adjusted width to allow wrapping */
+            width: auto;
+            min-width: 150px; /* Minimum width */
+            max-width: 300px; /* Maximum width before wrapping */
+            white-space: normal; /* Allow text wrapping */
         }
 
         .reading-table .today-row {
@@ -525,6 +537,9 @@
                 padding: 8px 4px;
                 font-size: 0.9rem;
             }
+             .reading-table .reading-col {
+                 min-width: 100px; /* Even smaller min-width on small screens */
+             }
         }
     </style>
 </head>
@@ -1300,7 +1315,7 @@
                                             <th class="date-col">Data</th>
                                             <th class="reading-col">Leitura</th>
                                             <th class="status-col">Rick</th>
-                                            <th class="status-col">Bruna</th> <!-- Abbreviated name -->
+                                            <th class="status-col">Bru</th> <!-- Abbreviated name -->
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -1349,7 +1364,7 @@
                                 <th class="date-col">Data</th>
                                 <th class="reading-col">Leitura</th>
                                 <th class="status-col">Rick</th>
-                                <th class="status-col">Bruna</th> <!-- Abbreviated name -->
+                                <th class="status-col">Bru</th> <!-- Abbreviated name -->
                             </tr>
                         </thead>
                         <tbody>
@@ -1439,5 +1454,3 @@
     </script>
 </body>
 </html>
-
-display(HTML(html_code))
