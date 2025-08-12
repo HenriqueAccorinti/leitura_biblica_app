@@ -1,3 +1,7 @@
+from IPython.display import display, HTML
+
+# Update the HTML code for the simplified interface
+html_code = '''
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -318,12 +322,7 @@
             top: 50%;
             transform: translateY(-50%);
         }
-         .today-reading .today-date-container button:nth-child(4) {
-            position: absolute;
-            right: 50px;
-            top: 50%;
-            transform: translateY(-50%);
-         }
+
 
          /* Ensure date display is centered and doesn't get covered by arrows */
          .today-reading .today-date-container .today-date {
@@ -580,8 +579,7 @@
                              <button onclick="navigateDate(-1)" id="prevDayBtn">◀</button>
                              <span class="today-date" id="todayDate"></span>
                              <button onclick="navigateDate(1)" id="nextDayBtn">▶</button>
-                             <button onclick="openCalendar()" id="calendarBtn">📅</button>
-                             <input type="date" id="datePicker" style="display:none;">
+                             <!-- Removed calendar button -->
                         </div>
                         <div class="today-verse" id="todayVerse">Carregando...</div>
                         <div class="reading-status" id="readingStatus"></div>
@@ -694,16 +692,7 @@
                 document.getElementById('offlineIndicator').style.display = 'block';
             });
 
-            // Set up date picker listener
-            document.getElementById('datePicker').addEventListener('change', (event) => {
-                const selectedDate = new Date(event.target.value + 'T00:00:00'); // Ensure correct timezone handling
-                if (!isNaN(selectedDate.getTime())) {
-                    currentDate = selectedDate;
-                    updateTodaySection(); // Update the section with the selected date's data
-                } else {
-                    showMessage('Data inválida selecionada.', 'error');
-                }
-            });
+            // Removed date picker listener
         });
 
         // Service Worker com Auto-Update
@@ -721,7 +710,7 @@
                 registration.addEventListener('updatefound', () => {
                     const newWorker = registration.installing;
                     console.log('Nova versão do app encontrada!');
-                    
+
                     newWorker.addEventListener('statechange', () => {
                         if (newWorker.state === 'installed') {
                             if (navigator.serviceWorker.controller) {
@@ -795,7 +784,7 @@
         function showTab(tabName) {
             // Update tab buttons
             document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
-            
+
             if (tabName === 'today') {
                 document.getElementById('todayTab').classList.add('active');
                 document.getElementById('todaySection').style.display = 'block';
@@ -862,8 +851,9 @@
 
         function updateTodaySection() {
             const dateToDisplay = currentDate;
-            const dateStr = dateToDisplay.toISOString().split('T')[0];
-            const todayActualStr = new Date().toISOString().split('T')[0];
+            // Use local date string for comparison and display
+            const dateStr = dateToDisplay.toLocaleDateString('en-CA'); // YYYY-MM-DD format for comparison
+            const todayActualStr = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD format for comparison
 
             // Update date display
             document.getElementById('todayDate').textContent =
@@ -966,7 +956,7 @@
         }
 
         function hasReadToday(date) {
-             const dateStr = date.toISOString().split('T')[0];
+             const dateStr = date.toLocaleDateString('en-CA'); // YYYY-MM-DD format for comparison
             const todayData = readingData.find(r => r.date === dateStr);
             return todayData && String(todayData[currentUser + '_read']).trim().toUpperCase() === 'TRUE';
         }
@@ -977,7 +967,7 @@
                 return;
             }
 
-            const dateToUpdate = currentDate.toISOString().split('T')[0];
+            const dateToUpdate = currentDate.toLocaleDateString('en-CA'); // Use local date string
             let dataToUpdate = readingData.find(r => r.date === dateToUpdate);
 
             if (!dataToUpdate) {
@@ -1083,28 +1073,28 @@
 
                     // Set currentDate to today after loading data, but only if it's the initial load
                     // or if the current displayed date is no longer in the loaded data
-                    const todayActualStr = new Date().toISOString().split('T')[0];
-                    const isCurrentDateInLoadedData = readingData.some(item => item.date === currentDate.toISOString().split('T')[0]);
+                    const todayActualStr = new Date().toLocaleDateString('en-CA'); // Use local date string
+                    const isCurrentDateInLoadedData = readingData.some(item => item.date === currentDate.toLocaleDateString('en-CA')); // Use local date string
 
                     if (readingData.length > 0 && !isCurrentDateInLoadedData) {
                         // If current date is not in data, set to today or first date available
-                         currentDate = new Date(readingData[0].date + 'T00:00:00');
-                         console.log("loadData: Current date not in data, setting to first available date:", currentDate.toISOString().split('T')[0]);
+                         currentDate = new Date(readingData[0].date + 'T00:00:00'); // Dates from sheet are already YYYY-MM-DD
+                         console.log("loadData: Current date not in data, setting to first available date:", currentDate.toLocaleDateString('en-CA'));
                     } else if (readingData.length === 0) {
                          currentDate = new Date(); // Default to today if no data
-                         console.log("loadData: No data, setting current date to today:", currentDate.toISOString().split('T')[0]);
+                         console.log("loadData: No data, setting current date to today:", currentDate.toLocaleDateString('en-CA'));
                     } else {
-                         console.log("loadData: Current date is valid and in data, keeping:", currentDate.toISOString().split('T')[0]);
+                         console.log("loadData: Current date is valid and in data, keeping:", currentDate.toLocaleDateString('en-CA'));
                     }
                      // If currentDate was already valid and in data, keep it.
 
                     updateTodaySection(); // Update UI with the determined date
-                    
+
                     // Update table if it's currently visible
                     if (document.getElementById('tableSection').style.display !== 'none') {
                         renderTable(fullView);
                     }
-                    
+
                     showMessage('Dados carregados com sucesso!', 'success');
 
                     // Save offline backup
@@ -1153,7 +1143,7 @@
             newDate.setDate(newDate.getDate() + days);
 
             // Find the closest available date in readingData
-            const newDateStr = newDate.toISOString().split('T')[0];
+            const newDateStr = newDate.toLocaleDateString('en-CA'); // Use local date string
             const closestData = readingData.find(item => item.date === newDateStr);
 
             if (closestData) {
@@ -1167,7 +1157,7 @@
 
                 while (searchLimit > 0) {
                     targetDate.setDate(targetDate.getDate() + (days > 0 ? 1 : -1));
-                    const targetDateStr = targetDate.toISOString().split('T')[0];
+                    const targetDateStr = targetDate.toLocaleDateString('en-CA'); // Use local date string
                     foundDateData = readingData.find(item => item.date === targetDateStr);
                     if (foundDateData) {
                         currentDate = new Date(foundDateData.date + 'T00:00:00'); // Update currentDate
@@ -1183,9 +1173,7 @@
             }
         }
 
-        function openCalendar() {
-             document.getElementById('datePicker').click(); // Trigger the hidden date input
-        }
+        // Removed openCalendar function
 
         async function updateSheetEntry(date, user, status) {
             if (!SCRIPT_URL) {
@@ -1240,7 +1228,7 @@
         // Table rendering functions
         function renderTable(showFull) {
             const container = document.getElementById('tableContainer');
-            const today = new Date().toISOString().split('T')[0];
+            const today = new Date().toLocaleDateString('en-CA'); // Use local date string for comparison
             const toggleBtn = document.getElementById('toggleViewBtn');
 
             console.log("renderTable: Rendering table. showFull:", showFull);
@@ -1441,3 +1429,6 @@
     </script>
 </body>
 </html>
+'''
+
+display(HTML(html_code))
