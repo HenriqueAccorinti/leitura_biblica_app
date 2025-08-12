@@ -411,8 +411,8 @@
         }
 
         .reading-table .date-col {
-            width: 120px;
-            min-width: 120px;
+            width: 100px; /* Adjusted width */
+            min-width: 100px; /* Adjusted min-width */
         }
 
         .reading-table .status-col {
@@ -1300,7 +1300,7 @@
                                             <th class="date-col">Data</th>
                                             <th class="reading-col">Leitura</th>
                                             <th class="status-col">Rick</th>
-                                            <th class="status-col">Bruna Diamante</th>
+                                            <th class="status-col">Bruna</th> <!-- Abbreviated name -->
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -1313,7 +1313,7 @@
                         html += `
                             <tr ${isToday ? 'class="today-row"' : ''}>
                                 <td class="date-col">
-                                    ${new Date(item.date + 'T00:00:00').toLocaleDateString('pt-BR')}
+                                    ${new Date(item.date + 'T00:00:00').toLocaleDateString('pt-BR', {day: '2-digit', month: '2-digit', year: '2-digit'})} <!-- Shortened date format -->
                                     ${isToday ? '<br><small>HOJE</small>' : ''}
                                 </td>
                                 <td class="reading-col">${item.reading}</td>
@@ -1349,7 +1349,7 @@
                                 <th class="date-col">Data</th>
                                 <th class="reading-col">Leitura</th>
                                 <th class="status-col">Rick</th>
-                                <th class="status-col">Bruna Diamante</th>
+                                <th class="status-col">Bruna</th> <!-- Abbreviated name -->
                             </tr>
                         </thead>
                         <tbody>
@@ -1364,7 +1364,7 @@
                     html += `
                         <tr ${isToday ? 'class="today-row"' : ''}>
                             <td class="date-col">
-                                ${new Date(item.date + 'T00:00:00').toLocaleDateString('pt-BR')}
+                                ${new Date(item.date + 'T00:00:00').toLocaleDateString('pt-BR', {day: '2-digit', month: '2-digit', year: '2-digit'})} <!-- Shortened date format -->
                                 ${isToday ? '<br><small>HOJE</small>' : ''}
                             </td>
                             <td class="reading-col">${item.reading}</td>
@@ -1439,3 +1439,5 @@
     </script>
 </body>
 </html>
+
+display(HTML(html_code))
