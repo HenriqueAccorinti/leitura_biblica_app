@@ -563,7 +563,7 @@
                             Rick
                         </button>
                         <button class="user-btn" onclick="selectUser('user2')" id="user2Btn">
-                            Bruna Diamante
+                            User2
                         </button>
                     </div>
                 </div>
@@ -832,7 +832,7 @@
             document.getElementById('configSection').style.display = 'block';
 
             // Update header
-            const userName = userId === 'user1' ? 'Rick' : 'Bruna Diamante';
+            const userName = userId === 'user1' ? 'Rick' : 'User2';
             const welcomeMessage = userId === 'user1' ? 'Bem-vindo' : 'Bem-vinda';
             document.getElementById('userInfo').textContent = `Oi ${userName}! ${welcomeMessage} :)`;
 
@@ -963,7 +963,7 @@
                     <span class="check-icon ${user2Read ? 'read' : 'not-read'}">
                         ${user2Read ? '✓' : '○'}
                     </span>
-                    Bruna Diamante: ${user2Read ? 'Leu' : 'Não leu'}
+                    User2: ${user2Read ? 'Leu' : 'Não leu'}
                 </div>`;
 
             } else {
@@ -1315,7 +1315,7 @@
                                             <th class="date-col">Data</th>
                                             <th class="reading-col">Leitura</th>
                                             <th class="status-col">Rick</th>
-                                            <th class="status-col">Bru</th> <!-- Abbreviated name -->
+                                            <th class="status-col">User 2</th> <!-- Abbreviated name -->
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -1364,7 +1364,7 @@
                                 <th class="date-col">Data</th>
                                 <th class="reading-col">Leitura</th>
                                 <th class="status-col">Rick</th>
-                                <th class="status-col">Bru</th> <!-- Abbreviated name -->
+                                <th class="status-col">User 2</th> <!-- Abbreviated name -->
                             </tr>
                         </thead>
                         <tbody>
